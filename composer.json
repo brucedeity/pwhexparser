@@ -1,0 +1,9 @@
+{
+    "name": "brucedeity/octetreader",
+    "description": "PHP package for reading PW's octets",
+    "autoload": {
+        "psr-4": {
+            "App\\": "app/"
+        }
+    }
+}
