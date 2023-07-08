@@ -13,6 +13,7 @@ const LINT_SIZE = 8;
 const SHORT_SIZE = 2;
 const ATTACK_RATE_FACTOR = 20;
 const CHAR_SIZE_IN_HEX = 4;
+const ULINT_SIZE = 16;
 
 class Decoder
 {
@@ -22,6 +23,7 @@ class Decoder
     private $namePos = 48;
     private $nameLength = 0;
     private $socketsCount = 0;
+    private $addonsCount = 0;
 
     public function __construct()
     {
@@ -41,7 +43,6 @@ class Decoder
 
         foreach ($typeClass->getStructure() as $field => $type) {
             // $result[$field] = $this->unmarshal($field, $type);
-
             // continue;
 
             $result[$field] = [
@@ -58,10 +59,16 @@ class Decoder
         return $result;
     }
 
-    public function unmarshal(string $field, string $type)
+    public function unmarshal(string $field, string $type, int $prefixToRemove = 0)
     {
         switch ($type)
         {
+            case 'addons_count':
+                return $this->getAddonsCount($field);
+
+            case 'addons':
+                return $this->getAddons();
+
             case 'sockets_count':
                 return $this->getSocketsCount($field);
 
@@ -81,18 +88,24 @@ class Decoder
                 $octet = substr($this->octetString, $this->position, INT_SIZE);
                 $this->parsedOctet = $octet;
                 $this->position += INT_SIZE;
-                return $this->toDecimal($octet, INT_SIZE, 0, true);
+                return $this->toDecimal($octet, INT_SIZE, $prefixToRemove, true);
 
             case 'lint':
                 $octet = substr($this->octetString, $this->position, LINT_SIZE);
                 $this->parsedOctet = $octet;
                 $this->position += LINT_SIZE;
-                return $this->toDecimal($octet, LINT_SIZE, 0, true);
+                return $this->toDecimal($octet, LINT_SIZE, $prefixToRemove, true);
+            
+            case 'ulint':
+                $octet = substr($this->octetString, $this->position, ULINT_SIZE);
+                $this->parsedOctet = $octet;
+                $this->position += LINT_SIZE;
+                return $this->toDecimal($octet, ULINT_SIZE, $prefixToRemove, false);
 
             case 'short':
                 $octet = substr($this->octetString, $this->position, SHORT_SIZE);
                 $this->parsedOctet = $octet;
-                $value = $this->toDecimal($octet, SHORT_SIZE, 0, true);
+                $value = $this->toDecimal($octet, SHORT_SIZE, $prefixToRemove, true);
 
                 $this->position += SHORT_SIZE;
                 return $value;
@@ -119,10 +132,97 @@ class Decoder
         return $name;
     }
 
+    public function getAddonsCount(string $field) : int
+    {
+        $this->addonsCount = $this->unmarshal($field, 'lint');
+        // $this->position += INT_SIZE;
+
+        return $this->addonsCount;
+    }
+
+    public function getAddons()
+    {
+        $addons = [
+            'special_addons' => [],
+            'normal_addons' => [],
+            'refine' => [],
+            'socket' => []
+        ];
+    
+        if ($this->addonsCount <= 0){
+            return $addons;
+        }
+    
+        $shift = 0;
+        $socketIndex = 0;
+    
+        for ($i=0; $i < $this->addonsCount; $i++) { 
+    
+            $addonPos = $this->position + ($i * ULINT_SIZE) + $shift;
+            $hex = substr($this->octetString, $addonPos, LINT_SIZE);
+            $hexString = $this->reverseNumber($hex);
+            $octet = ltrim($hexString, '0');
+            $octet = trim($octet);
+    
+            $addonType = substr($octet, 0, 1);
+    
+            if ($addonType == "4"){
+    
+                $addonId = $this->toDecimal($octet, LINT_SIZE, $addonType, false);
+    
+                if (($addonId > 1691) && ($addonId < 1892)){
+                    $addons['refine'] = [
+                        'id' => $addonId,
+                        'value' => $this->toDecimal(substr($this->octetString, $addonPos + LINT_SIZE, LINT_SIZE), LINT_SIZE, 0, true),
+                        'level' => $this->toDecimal(substr($this->octetString, $addonPos + ULINT_SIZE, LINT_SIZE), LINT_SIZE, 0, true)
+                    ];
+                }
+                else
+                {
+                    $addon = [
+                        'id' => $addonId,
+                        'value' => $this->toDecimal(substr($this->octetString, $addonPos + LINT_SIZE, LINT_SIZE), LINT_SIZE, 0, true),
+                        'level' => $this->toDecimal(substr($this->octetString, $addonPos + ULINT_SIZE, LINT_SIZE), LINT_SIZE, 0, true)
+                    ];
+    
+                    array_push($addons['special_addons'], $addon);
+                    $shift += 8;
+                }
+            }
+            else if ($addonType == 'a')
+            {
+                $socketIndex++;
+                $addonId = $this->toDecimal($octet, LINT_SIZE, $addonType, false);
+                $socketAddon = [
+                    'index' => $socketIndex,
+                    'id' => $addonId,
+                    'value' => $this->toDecimal(substr($this->octetString, $addonPos + LINT_SIZE, LINT_SIZE), LINT_SIZE, 0, true),
+                ];
+    
+                array_push($addons['socket'], $socketAddon);
+            }
+            else
+            {
+                $addonId = $this->toDecimal($this->reverseNumber($octet, LINT_SIZE / 2), LINT_SIZE / 2, 0, true);
+                $addonValue = $this->toDecimal(substr($this->octetString, $addonPos + LINT_SIZE, LINT_SIZE), LINT_SIZE, 0, true);
+                $addon = [
+                    'id' => $addonId,
+                    'value' => $addonValue
+                ];
+            
+                array_push($addons['normal_addons'], $addon);
+            }
+        }
+    
+        return $addons;
+    }
+    
+
     public function getSocketsCount(string $field) : int
     {
-        $this->socketsCount = $this->unmarshal($field, 'lint');
-    
+        $this->socketsCount = $this->unmarshal($field, 'int');
+        $this->position += INT_SIZE;
+
         return $this->socketsCount;
     }
 
@@ -130,11 +230,15 @@ class Decoder
     {
         $sockets = [];
 
-        if ($this->socketsCount <= 0)
+        if ($this->socketsCount <= 0){
             return $sockets;
+        }
+        else if ($this->socketsCount > 4){
+            throw new \Exception('Invalid sockets count, max value is 4, got ' . $this->socketsCount . ' instead');
 
+        }
 
-        for ($i=1; $i < $this->socketsCount; $i++) { 
+        for ($i=0; $i < $this->socketsCount; $i++) { 
 
             $octet = $this->position + ($i * LINT_SIZE);
             $octet = substr($this->octetString, $octet, LINT_SIZE);

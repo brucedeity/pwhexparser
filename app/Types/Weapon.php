@@ -34,7 +34,7 @@ class Weapon implements Item
             'minimum_effective_range' => 'float',
             'sockets_count' => 'sockets_count',
             'sockets' => 'sockets',
-            'addons_count' => 'int',
+            'addons_count' => 'addons_count',
             'addons' => 'addons',
         ];
     }
