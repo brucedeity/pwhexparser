@@ -4,7 +4,7 @@ namespace App\Types;
 
 use App\Interfaces\Item;
 
-class Armor implements Item
+class Jewelry implements Item
 {
     public function getStructure(): array
     {
@@ -21,10 +21,10 @@ class Armor implements Item
             'item_flag' => 'short',
             'name_length' => 'name_length',
             'name' => 'name',
+            'physical_attack' => 'lint',
+            'magic_attack' => 'lint',
             'physical_defense' => 'lint',
-            'evasion' => 'lint',
-            'mp' => 'lint',
-            'hp' => 'lint',
+            'dodge' => 'lint',
             'metal_resistance' => 'lint',
             'wood_resistance' => 'lint',
             'water_resistance' => 'lint',

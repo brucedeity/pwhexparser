@@ -27,7 +27,8 @@ class Decoder
 
     public function __construct()
     {
-        $this->octetString = '64002000360000002e010000a8670000007d00002c000406480075007a0002000000c55c00000f00000000000000ad02000004040000000000000000000010000000000020400000000002000900d0070000d007000006000000e34800009004000001000000c725000013000000c725000013000000aa460000d40100000a000000e1a1000064000000e1a1000064000000';
+        $this->octetString = '010000006700220003004100';
+        $this->octetString = '0100000067002200030877006500770072004100'; // With name
     }
 
     public function getOctetString() : string
@@ -37,7 +38,7 @@ class Decoder
 
     public function decodeOctets(string $octets = '') : array
     {
-        $typeClass = $this->getTypeClass('Weapon');
+        $typeClass = $this->getTypeClass('Fashion');
 
         $result = [];
 
@@ -293,7 +294,7 @@ class Decoder
         return round($attackRate, 2);
     }
 
-    public function getNameLength(string $field) : int
+    public function getNameLength(string $field) : mixed
     {
         $nameLength = $this->unmarshal($field, 'short') / 2;
 
@@ -304,7 +305,7 @@ class Decoder
 
     public function getTypeClass(string $type) : object
     {
-        if (!in_array($type, ['Weapon', 'Armor']))
+        if (!in_array($type, ['Weapon', 'Armor', 'Jewelry', 'Fashion']))
             throw new \Exception('Invalid type');
 
         $class = 'App\Types\\' . $type;
