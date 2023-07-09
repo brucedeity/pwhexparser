@@ -9,8 +9,7 @@ class Fashion implements Item
     public function getStructure(): array
     {
         return [
-            'level_req' => 'int',
-            'unknow' => 'int',
+            'level_req' => 'lint',
             'color' => 'int',
             'gender' => 'int',
             'creator_type' => 'short',
@@ -22,6 +21,6 @@ class Fashion implements Item
 
     public function getMinimumLength() : int
     {
-        return 24;
+        return 20;
     }
 }

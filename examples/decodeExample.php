@@ -3,8 +3,8 @@
 require __DIR__ . '/../vendor/autoload.php';
 
 $decoder = new App\Decoder();
-$decoder->setItemType('Weapon');
-$decoder->sethexString('0100ff02050000000000030078050000780500002c00010000000000240100000000000000000000030000000300000005000000050000001000000000004040000000000000000000000000');
+$decoder->setItemType('Fashion');
+$decoder->sethexString('1e00000092470100010a620072007500630065000000');
 $decoder->validateHex();
 $result = $decoder->decodeHexString();
 
