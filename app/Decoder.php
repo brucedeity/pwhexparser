@@ -27,7 +27,7 @@ class Decoder
 
     public function __construct()
     {
-        $this->octetString = '1b00ff005300000012000000e81c0000e81c00002c00030e4400720061006b00610065007200010000000d00000004000000622100007d000000220100002c010000c2010000040000000000a0410000a04003000000350e0000350e000000000000050000009c25000011000000c14100002d03000001000000b346000032000000050000002ca200000c0000002ca200000c000000';
+        $this->octetString = '64002000360000002e010000a8670000007d00002c000406480075007a0002000000c55c00000f00000000000000ad02000004040000000000000000000010000000000020400000000002000900d0070000d007000006000000e34800009004000001000000c725000013000000c725000013000000aa460000d40100000a000000e1a1000064000000e1a1000064000000';
     }
 
     public function getOctetString() : string
@@ -153,41 +153,68 @@ class Decoder
             return $addons;
         }
     
-        $shift = 0;
         $socketIndex = 0;
-    
-        for ($i=0; $i < $this->addonsCount; $i++) { 
-    
+        $shift = 0;
+
+        for ($i=0; $i < $this->addonsCount; $i++) {
+
+            // echo 'shift: '.$shift . '<br>';
+
             $addonPos = $this->position + ($i * ULINT_SIZE) + $shift;
+
+            // echo 'addonPos: ' . $addonPos . '<br>';
+
             $hex = substr($this->octetString, $addonPos, LINT_SIZE);
+
+            // echo 'partOctet: '.$hex. '<br>';
+
             $hexString = $this->reverseNumber($hex);
             $octet = ltrim($hexString, '0');
+
+            if (strlen($octet) % 2 != 0)
+                continue;
+
+            // echo $octet . '<br>';
+
             $octet = trim($octet);
-    
+
             $addonType = substr($octet, 0, 1);
-    
+
+            // echo 'addonType: ' . $addonType . '<br>';
+
             if ($addonType == "4"){
     
                 $addonId = $this->toDecimal($octet, LINT_SIZE, $addonType, false);
-    
+
+                $valueOctet = substr($this->octetString, $addonPos + LINT_SIZE, LINT_SIZE);
+                $levelOctet = substr($this->octetString, $addonPos + ULINT_SIZE, LINT_SIZE);
+                
                 if (($addonId > 1691) && ($addonId < 1892)){
                     $addons['refine'] = [
                         'id' => $addonId,
-                        'value' => $this->toDecimal(substr($this->octetString, $addonPos + LINT_SIZE, LINT_SIZE), LINT_SIZE, 0, true),
-                        'level' => $this->toDecimal(substr($this->octetString, $addonPos + ULINT_SIZE, LINT_SIZE), LINT_SIZE, 0, true)
+                        'value' => $this->toDecimal($valueOctet, LINT_SIZE, 0, true),
+                        'valueOctet' => $valueOctet,
+                        'level' => $this->toDecimal($levelOctet, LINT_SIZE, 0, true),
+                        'levelOctet' => $levelOctet,
                     ];
                 }
                 else
                 {
+                    $valueOctet = substr($this->octetString, $addonPos + LINT_SIZE, LINT_SIZE);
+                    $levelOctet = substr($this->octetString, $addonPos + ULINT_SIZE, LINT_SIZE);
+
                     $addon = [
                         'id' => $addonId,
-                        'value' => $this->toDecimal(substr($this->octetString, $addonPos + LINT_SIZE, LINT_SIZE), LINT_SIZE, 0, true),
-                        'level' => $this->toDecimal(substr($this->octetString, $addonPos + ULINT_SIZE, LINT_SIZE), LINT_SIZE, 0, true)
+                        'value' => $this->toDecimal($valueOctet, LINT_SIZE, 0, true),
+                        'valueOctet' => $valueOctet,
+                        'level' => $this->toDecimal($levelOctet, LINT_SIZE, 0, true),
+                        'levelOctet' => $levelOctet,
                     ];
     
                     array_push($addons['special_addons'], $addon);
-                    $shift += 8;
                 }
+
+                $shift += LINT_SIZE;
             }
             else if ($addonType == 'a')
             {
@@ -200,20 +227,30 @@ class Decoder
                 ];
     
                 array_push($addons['socket'], $socketAddon);
+                // $shift += LINT_SIZE;
             }
             else
             {
-                $addonId = $this->toDecimal($this->reverseNumber($octet, LINT_SIZE / 2), LINT_SIZE / 2, 0, true);
-                $addonValue = $this->toDecimal(substr($this->octetString, $addonPos + LINT_SIZE, LINT_SIZE), LINT_SIZE, 0, true);
+                $valueOctet = substr($this->octetString, $addonPos + LINT_SIZE, LINT_SIZE);
+
+                $addonIdOctet = substr($octet, 1);
+                $addonId = hexdec($addonIdOctet);
+                
+                $addonValue = intval($this->toDecimal($valueOctet, LINT_SIZE, 0, true), 10);
+
                 $addon = [
                     'id' => $addonId,
-                    'value' => $addonValue
+                    'idOctet' => $addonIdOctet,
+                    'value' => $addonValue,
+                    'valueOctet' => $valueOctet,
                 ];
             
                 array_push($addons['normal_addons'], $addon);
             }
         }
-    
+
+        // exit;
+
         return $addons;
     }
     
@@ -317,7 +354,7 @@ class Decoder
         return $float_value;
     }
 
-    public function toDecimal(string $hexString, int $expectedLength, int $prefixToRemove = 0, bool $reverse = true)
+    public function toDecimal(string $hexString, int $expectedLength, mixed $prefixToRemove = 0, bool $reverse = true)
     {
         $paddingLength = $expectedLength - strlen($hexString);
         
