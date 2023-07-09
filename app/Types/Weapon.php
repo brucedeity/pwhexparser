@@ -38,4 +38,9 @@ class Weapon implements Item
             'addons' => 'addons',
         ];
     }
+
+    public function getMinimumLength() : int
+    {
+        return 151;
+    }
 }

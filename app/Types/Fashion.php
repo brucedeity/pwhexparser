@@ -19,4 +19,9 @@ class Fashion implements Item
             'color_mask' => 'int',
         ];
     }
+
+    public function getMinimumLength() : int
+    {
+        return 24;
+    }
 }

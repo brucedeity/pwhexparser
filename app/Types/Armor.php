@@ -36,4 +36,9 @@ class Armor implements Item
             'addons' => 'addons',
         ];
     }
+
+    public function getMinimumLength() : int
+    {
+        return 135;
+    }
 }

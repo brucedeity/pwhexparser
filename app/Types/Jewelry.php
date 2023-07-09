@@ -36,4 +36,9 @@ class Jewelry implements Item
             'addons' => 'addons',
         ];
     }
+
+    public function getMinimumLength() : int
+    {
+        return 135;
+    }
 }
