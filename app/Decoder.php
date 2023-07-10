@@ -9,6 +9,7 @@ const LINT_SIZE = 8;
 const SHORT_SIZE = 2;
 const ATTACK_RATE_FACTOR = 20;
 const SUPER_INT_SIZE = 16;
+
 const AVAILABLE_TYPES = [
     'Weapon',
     'Armor',
@@ -20,7 +21,12 @@ const AVAILABLE_TYPES = [
     'BlessBox',
     'Genie',
     'Charm',
-    'AttackCharm'
+    'AttackCharm',
+    'Ammo',
+    'Potion',
+    'TaskDice',
+    'PetFood',
+    'SoulStone',
 ];
 
 class Decoder
