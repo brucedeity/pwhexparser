@@ -18,6 +18,7 @@ class Decoder
     private $nameLength = 0;
     private $socketsCount = 0;
     private $addonsCount = 0;
+    private $skillsCount = 0;
     private $itemType;
 
     public function sethexString(string $hexString): void
@@ -32,7 +33,7 @@ class Decoder
 
     public function setItemType(string $itemType): void
     {
-        if (!in_array($itemType, ['Weapon', 'Armor', 'Jewelry', 'Fashion', 'Card', 'Flight'])) {
+        if (!in_array($itemType, ['Weapon', 'Armor', 'Jewelry', 'Pet', 'Fashion', 'Card', 'Flight', 'BlessBox'])) {
             throw new \Exception('Error when trying to set an invalid item type: ' . $itemType);
         }
 
@@ -74,7 +75,7 @@ class Decoder
         return $result;
     }
 
-    public function debugOctets(): array
+    public function debugHexString(): array
     {
         $result = [];
 
@@ -106,6 +107,15 @@ class Decoder
 
             case 'name':
                 return $this->getName();
+
+            case 'pack_name':
+                return $this->packName();
+
+            case 'pet_skills':
+                return $this->getPetSkills($field);
+
+            case 'skills_count':
+                return $this->getSkillsCount($field);
 
             case 'attack_rate':
                 return $this->getAttackRate($field);
@@ -145,15 +155,62 @@ class Decoder
         }
     }
 
+    public function getSkillsCount(string $field) : int
+    {
+        $this->skillsCount = $this->decodeType($field, 'int');
+
+        $this->position += SUPER_INT_SIZE;
+
+        return $this->skillsCount;
+    }
+
+    public function getPetSkills(string $field) : array
+    {
+        $skills = [];
+
+        for ($i = 0; $i < $this->skillsCount; $i++) {
+
+            $skillPos = $this->position + SUPER_INT_SIZE + ($i * SUPER_INT_SIZE);
+
+            $skill = [
+                'id' => $this->hexToDecimal(substr($this->getHexString(), $skillPos, LINT_SIZE), LINT_SIZE, 0, true),
+                'level' => $this->hexToDecimal(substr($this->getHexString(), $skillPos + LINT_SIZE, LINT_SIZE), LINT_SIZE, 0, true),
+            ];
+
+            array_push($skills, $skill);
+        }
+
+        return $skills;
+    }
+
     public function getName(): string
     {
         $name = '';
 
-        for ($i = 0; $i < $this->nameLength; $i++) {
+        $nameLength = $this->nameLength / 2;
+
+        for ($i = 0; $i < $nameLength; $i++) {
             $name .= chr($this->hexToDecimal(substr($this->getHexString(), $this->position + $i * INT_SIZE, 2), 2, 0, true));
         }
 
-        $this->position += $this->nameLength * INT_SIZE;
+        $this->position += $nameLength * INT_SIZE;
+
+        return $name;
+    }
+
+    public function packName() : string
+    {
+        $name = '';
+
+        $initialPos = $this->position + INT_SIZE;
+        
+        for ($i = 0; $i < $this->nameLength; $i++) {
+            $parsedOctet = substr($this->getHexString(), $initialPos + $i * INT_SIZE + SHORT_SIZE, SHORT_SIZE);
+            
+            $name .= pack("H*", $parsedOctet);
+        }
+
+        $this->position += SHORT_SIZE;
 
         return $name;
     }
@@ -161,6 +218,9 @@ class Decoder
     public function getAddonsCount(string $field): int
     {
         $this->addonsCount = $this->decodeType($field, 'lint');
+
+        if ($this->addonsCount > 30)
+            throw new \Exception('Invalid addons count, max value is 30, got ' . $this->addonsCount . ' instead');
 
         return $this->addonsCount;
     }
@@ -268,14 +328,18 @@ class Decoder
 
     public function getAttackRate(string $field): float
     {
-        $attackRate = ATTACK_RATE_FACTOR / $this->decodeType($field, 'lint');
+        $attackRate = $this->decodeType($field, 'lint');
+
+        if ($attackRate <= 0) return 0;
+
+        $attackRate = ATTACK_RATE_FACTOR / $attackRate;
 
         return round($attackRate, 2);
     }
 
     public function getNameLength(string $field): int
     {
-        $nameLength = $this->decodeType($field, 'short') / 2;
+        $nameLength = $this->decodeType($field, 'short');
         $this->nameLength = $nameLength;
 
         return $nameLength;

@@ -1,0 +1,12 @@
+<?php
+
+require __DIR__ . '/../vendor/autoload.php';
+
+$decoder = new App\Decoder();
+$decoder->setItemType('Armor');
+$decoder->sethexString('6300ff0f67000000670000002f7100003c73000024000406480075007a00d3020000000000000000000050000000650400006504000065040000650400006504000004000d00de070000de070000de070000de070000070000007422000050000000b225000009000000bc25000009000000f3a1000096000000f3a1000096000000f3a1000096000000f3a1000096000000');
+$decoder->validateHex();
+$result = $decoder->decodeHexString();
+
+header('Content-Type: application/json');
+echo json_encode($result, JSON_PRETTY_PRINT);
