@@ -290,7 +290,7 @@ class Decoder
         return $addons;
     }
 
-    public function getSocketsCount(string $field): int
+    private function getSocketsCount(string $field): int
     {
         $this->socketsCount = $this->decodeType($field, 'int');
         $this->position += INT_SIZE;
@@ -298,7 +298,7 @@ class Decoder
         return $this->socketsCount;
     }
 
-    public function getSockets()
+    private function getSockets()
     {
         $sockets = [];
 
@@ -318,7 +318,7 @@ class Decoder
         return $sockets;
     }
 
-    public function getAttackRate(string $field): float
+    private function getAttackRate(string $field): float
     {
         $attackRate = $this->decodeType($field, 'lint');
         if ($attackRate <= 0) return 0;
@@ -327,7 +327,7 @@ class Decoder
         return round($attackRate, 2);
     }
 
-    public function getNameLength(string $field): int
+    private function getNameLength(string $field): int
     {
         $nameLength = $this->decodeType($field, 'short');
         $this->nameLength = $nameLength;
@@ -335,25 +335,25 @@ class Decoder
         return $nameLength;
     }
 
-    public function getDurability(string $field): int
+    private function getDurability(string $field): int
     {
         $durability = $this->decodeType($field, 'lint');
 
         return $durability / DURABILITY_DIVIDER;
     }
 
-    public function reverseHexNumber($number)
+    private function reverseHexNumber($number)
     {
         return implode('', array_reverse(str_split($number, 2)));
     }
 
-    public function toFloat(string $hex): float
+    private function toFloat(string $hex): float
     {
         $float_value = unpack("f", pack("H*", $hex))[1];
         return $float_value;
     }
 
-    public function hexToDecimal(string $hexString, int $expectedLength, mixed $prefixToRemove = 0, bool $reverse = true)
+    private function hexToDecimal(string $hexString, int $expectedLength, mixed $prefixToRemove = 0, bool $reverse = true)
     {
         $paddingLength = $expectedLength - strlen($hexString);
 

@@ -1,5 +1,5 @@
 {
-    "name": "brucedeity/octetreader",
+    "name": "brucedeity/pwhexparser",
     "description": "PHP package for reading PW's octets",
     "autoload": {
         "psr-4": {
