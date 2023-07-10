@@ -5,7 +5,6 @@ require __DIR__ . '/../vendor/autoload.php';
 $decoder = new App\Decoder();
 $decoder->setItemType('SoulStone');
 $decoder->sethexString('010000004122000005000000010000004122000005000000');
-$decoder->validateHex();
 $result = $decoder->decodeHexString();
 
 header('Content-Type: application/json');

@@ -2,38 +2,15 @@
 
 namespace App;
 
+require_once 'Constants.php';
+
 use App\Interfaces\Item;
-
-const INT_SIZE = 4;
-const LINT_SIZE = 8;
-const SHORT_SIZE = 2;
-const ATTACK_RATE_FACTOR = 20;
-const SUPER_INT_SIZE = 16;
-
-const AVAILABLE_TYPES = [
-    'Weapon',
-    'Armor',
-    'Jewelry',
-    'Pet',
-    'Fashion',
-    'Card',
-    'Flight',
-    'BlessBox',
-    'Genie',
-    'Charm',
-    'AttackCharm',
-    'Ammo',
-    'Potion',
-    'TaskDice',
-    'PetFood',
-    'SoulStone',
-];
 
 class Decoder
 {
     private $position = 0;
     private $hexString = '';
-    private $parsedOctet = ''; // Will be deleted
+    private $parsedHex = ''; // Will be deleted
     private $nameLength = 0;
     private $socketsCount = 0;
     private $addonsCount = 0;
@@ -66,25 +43,26 @@ class Decoder
         return $this->itemType;
     }
 
-    public function validateHex(): bool
+    private function validateHex(): void
     {
         if (empty($this->getHexString())) {
             throw new \Exception('Hex string not set, please use setHexString() method before calling validateHex()');
         }
-
-        if ($this->getItemType() === null) {
+        elseif (!ctype_xdigit($this->getHexString())) {
+            throw new \Exception('Invalid hexadecimal string for type '. get_class($this->itemType));
+        }
+        elseif ($this->getItemType() === null) {
             throw new \Exception('Item type not set, please use setItemType() method before calling decodeHexString()');
         }
-
-        if (strlen($this->getHexString()) < $this->getItemType()->getMinimumLength()) {
+        elseif (strlen($this->getHexString()) < $this->getItemType()->getMinimumLength()) {
             throw new \Exception('Hex string is too short for ' . get_class($this->itemType) . ', given: ' . strlen($this->getHexString()) . ', expected: ' . $this->getItemType()->getMinimumLength() . '');
         }
-
-        return true;
-    }
+    }    
 
     public function decodeHexString(): array
     {
+        $this->validateHex();
+
         $result = [];
 
         foreach ($this->getItemType()->getStructure() as $field => $type) {
@@ -96,20 +74,22 @@ class Decoder
 
     public function debugHexString(): array
     {
+        $this->validateHex();
+
         $result = [];
 
         foreach ($this->getItemType()->getStructure() as $field => $type) {
             $result[$field] = [
                 'pos' => $this->position,
                 'value' => $this->decodeType($field, $type),
-                'octet' => $this->parsedOctet,
+                'hex' => $this->parsedHex,
             ];
         }
 
         return $result;
     }
 
-    public function decodeType(string $field, string $type, int $prefixToRemove = 0)
+    private function decodeType(string $field, string $type, int $prefixToRemove = 0)
     {
         switch ($type) {
             case 'addons_count':
@@ -147,19 +127,19 @@ class Decoder
 
             case 'int':
                 $hex = substr($this->getHexString(), $this->position, INT_SIZE);
-                $this->parsedOctet = $hex;
+                $this->parsedHex = $hex;
                 $this->position += INT_SIZE;
                 return $this->hexToDecimal($hex, INT_SIZE, $prefixToRemove, true);
 
             case 'lint':
                 $hex = substr($this->getHexString(), $this->position, LINT_SIZE);
-                $this->parsedOctet = $hex;
+                $this->parsedHex = $hex;
                 $this->position += LINT_SIZE;
                 return $this->hexToDecimal($hex, LINT_SIZE, $prefixToRemove, true);
 
             case 'short':
                 $hex = substr($this->getHexString(), $this->position, SHORT_SIZE);
-                $this->parsedOctet = $hex;
+                $this->parsedHex = $hex;
                 $value = $this->hexToDecimal($hex, SHORT_SIZE, $prefixToRemove, true);
 
                 $this->position += SHORT_SIZE;
@@ -168,22 +148,21 @@ class Decoder
             case 'float':
                 $hex = substr($this->getHexString(), $this->position, LINT_SIZE);
 
-                $this->parsedOctet = $hex;
+                $this->parsedHex = $hex;
                 $this->position += LINT_SIZE;
                 return $this->toFloat($hex);
         }
     }
 
-    public function getSkillsCount(string $field) : int
+    private function getSkillsCount(string $field) : int
     {
         $this->skillsCount = $this->decodeType($field, 'int');
-
         $this->position += SUPER_INT_SIZE;
 
         return $this->skillsCount;
     }
 
-    public function getSkills(string $field) : array
+    private function getSkills(string $field) : array
     {
         $skills = [];
 
@@ -202,7 +181,7 @@ class Decoder
         return $skills;
     }
 
-    public function getName(): string
+    private function getName(): string
     {
         $name = '';
 
@@ -217,16 +196,16 @@ class Decoder
         return $name;
     }
 
-    public function packName() : string
+    private function packName() : string
     {
         $name = '';
 
         $initialPos = $this->position + INT_SIZE;
         
         for ($i = 0; $i < $this->nameLength; $i++) {
-            $parsedOctet = substr($this->getHexString(), $initialPos + $i * INT_SIZE + SHORT_SIZE, SHORT_SIZE);
+            $parsedHex = substr($this->getHexString(), $initialPos + $i * INT_SIZE + SHORT_SIZE, SHORT_SIZE);
             
-            $name .= pack("H*", $parsedOctet);
+            $name .= pack("H*", $parsedHex);
         }
 
         $this->position += SHORT_SIZE;
@@ -234,7 +213,7 @@ class Decoder
         return $name;
     }
 
-    public function getAddonsCount(string $field): int
+    private function getAddonsCount(string $field): int
     {
         $this->addonsCount = $this->decodeType($field, 'lint');
 
@@ -244,7 +223,7 @@ class Decoder
         return $this->addonsCount;
     }
 
-    public function getAddons()
+    private function getAddons()
     {
         $addons = [
             'special_addons' => [],
@@ -262,55 +241,49 @@ class Decoder
 
         for ($i = 0; $i < $this->addonsCount; $i++) {
             $addonPos = $this->position + $i * SUPER_INT_SIZE + $shift;
-            $hex = substr($this->getHexString(), $addonPos, LINT_SIZE);
-            $hex = ltrim($this->reverseHexNumber($hex), '0');
+            $hexString = substr($this->getHexString(), $addonPos, LINT_SIZE);
+            $hexString = ltrim($this->reverseHexNumber($hexString), '0');
 
-            if (strlen($hex) % 2 != 0) {
+            if (strlen($hexString) % 2 != 0) {
                 continue;
             }
 
-            $hex = trim($hex);
-            $addonType = substr($hex, 0, 1);
+            $hexString = trim($hexString);
+            $addonType = substr($hexString, 0, 1);
 
-            if ($addonType == "4") {
-                $addonId = $this->hexToDecimal($hex, LINT_SIZE, $addonType, false);
+            if ($addonType == SPECIAL_ADDON) {
+                $addonId = $this->hexToDecimal($hexString, LINT_SIZE, $addonType, false);
+                $addon = [
+                    'id' => $addonId,
+                    'value' => $this->hexToDecimal(substr($this->getHexString(), $addonPos + LINT_SIZE, LINT_SIZE), LINT_SIZE, 0, true),
+                    'level' => $this->hexToDecimal(substr($this->getHexString(), $addonPos + SUPER_INT_SIZE, LINT_SIZE), LINT_SIZE, 0, true),
+                ];
 
                 if ($addonId > 1691 && $addonId < 1892) {
-                    $addons['refine'] = [
-                        'id' => $addonId,
-                        'value' => $this->hexToDecimal(substr($this->getHexString(), $addonPos + LINT_SIZE, LINT_SIZE), LINT_SIZE, 0, true),
-                        'level' => $this->hexToDecimal(substr($this->getHexString(), $addonPos + SUPER_INT_SIZE, LINT_SIZE), LINT_SIZE, 0, true),
-                    ];
+                    $addons['refine'] = $addon;
                 } else {
-                    $addon = [
-                        'id' => $addonId,
-                        'value' => $this->hexToDecimal(substr($this->getHexString(), $addonPos + LINT_SIZE, LINT_SIZE), LINT_SIZE, 0, true),
-                        'level' => $this->hexToDecimal(substr($this->getHexString(), $addonPos + SUPER_INT_SIZE, LINT_SIZE), LINT_SIZE, 0, true),
-                    ];
-
-                    array_push($addons['special_addons'], $addon);
+                    $addons['special_addons'][] = $addon;
                 }
 
                 $shift += LINT_SIZE;
-            } elseif ($addonType == 'a') {
+            } elseif ($addonType == SOCKET_ADDON) {
                 $socketIndex++;
-                $addonId = $this->hexToDecimal($hex, LINT_SIZE, $addonType, false);
+                $addonId = $this->hexToDecimal($hexString, LINT_SIZE, $addonType, false);
                 $socketAddon = [
                     'index' => $socketIndex,
                     'id' => $addonId,
                     'value' => $this->hexToDecimal(substr($this->getHexString(), $addonPos + LINT_SIZE, LINT_SIZE), LINT_SIZE, 0, true),
                 ];
 
-                array_push($addons['socket'], $socketAddon);
+                $addons['socket'][] = $socketAddon;
             } else {
-                $addonId = hexdec(substr($hex, 1));
-
+                $addonId = hexdec(substr($hexString, 1));
                 $addon = [
                     'id' => $addonId,
                     'value' => intval($this->hexToDecimal(substr($this->getHexString(), $addonPos + LINT_SIZE, LINT_SIZE), LINT_SIZE, 0, true), 10),
                 ];
 
-                array_push($addons['normal_addons'], $addon);
+                $addons['normal_addons'][] = $addon;
             }
         }
 
@@ -366,7 +339,7 @@ class Decoder
     {
         $durability = $this->decodeType($field, 'lint');
 
-        return $durability / 100;
+        return $durability / DURABILITY_DIVIDER;
     }
 
     public function reverseHexNumber($number)
