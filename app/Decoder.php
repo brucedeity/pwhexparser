@@ -9,6 +9,19 @@ const LINT_SIZE = 8;
 const SHORT_SIZE = 2;
 const ATTACK_RATE_FACTOR = 20;
 const SUPER_INT_SIZE = 16;
+const AVAILABLE_TYPES = [
+    'Weapon',
+    'Armor',
+    'Jewelry',
+    'Pet',
+    'Fashion',
+    'Card',
+    'Flight',
+    'BlessBox',
+    'Genie',
+    'Charm',
+    'AttackCharm'
+];
 
 class Decoder
 {
@@ -33,7 +46,7 @@ class Decoder
 
     public function setItemType(string $itemType): void
     {
-        if (!in_array($itemType, ['Weapon', 'Armor', 'Jewelry', 'Pet', 'Fashion', 'Card', 'Flight', 'BlessBox'])) {
+        if (!in_array($itemType, AVAILABLE_TYPES)) {
             throw new \Exception('Error when trying to set an invalid item type: ' . $itemType);
         }
 
@@ -111,8 +124,8 @@ class Decoder
             case 'pack_name':
                 return $this->packName();
 
-            case 'pet_skills':
-                return $this->getPetSkills($field);
+            case 'skills':
+                return $this->getSkills($field);
 
             case 'skills_count':
                 return $this->getSkillsCount($field);
@@ -164,7 +177,7 @@ class Decoder
         return $this->skillsCount;
     }
 
-    public function getPetSkills(string $field) : array
+    public function getSkills(string $field) : array
     {
         $skills = [];
 
@@ -329,11 +342,9 @@ class Decoder
     public function getAttackRate(string $field): float
     {
         $attackRate = $this->decodeType($field, 'lint');
-
         if ($attackRate <= 0) return 0;
 
         $attackRate = ATTACK_RATE_FACTOR / $attackRate;
-
         return round($attackRate, 2);
     }
 

@@ -23,7 +23,7 @@ class Pet implements Item
             'name_length' => 'name_length',
             'name' => 'pack_name',
             'skills_count' => 'skills_count',
-            'skills' => 'pet_skills',
+            'skills' => 'skills',
         ];
     }
 
