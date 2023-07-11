@@ -38,6 +38,43 @@ class Decoder
         $this->itemType = new $itemTypeObject();
     }
 
+    public function guessItemType(int $mask) : void
+    {
+        $types = [
+            0 => 'Unequippable',
+            1 => 'Weapon',
+            16 => 'Armor',
+            64 => 'Armor',
+            128 => 'Armor',
+            256 => 'Armor',
+            2 => 'Armor',
+            8 => 'Armor',
+            4 => 'Jewelry',
+            32 => 'Fashion',
+            1536 => 'Jewelry',
+            262144 => 'Card',
+            4096 => 'Flight',
+            8192 => 'Fashion',
+            16384 => 'Fashion',
+            65536 => 'Fashion',
+            32768 => 'Fashion',
+            524288 => 'Fashion',
+            131072 => 'AttackCharm',
+            1048576 => 'Charm',
+            2097152 => 'Charm',
+            2048 => 'Ammo',
+            1077936128 => 'BlessBox',
+            8388608 => 'Pet',
+            33554432 => 'Fashion',
+            16777216 => 'Genie'
+        ];
+
+        if (!isset($types[$mask]))
+            throw new \Exception('Unable to guess item type from mask: ' . $mask);
+
+        $this->setItemType($types[$mask]);
+    }
+
     public function getItemType(): Item
     {
         return $this->itemType;
@@ -339,7 +376,7 @@ class Decoder
     {
         $durability = $this->decodeType($field, 'lint');
 
-        return $durability / DURABILITY_DIVIDER;
+        return intval($durability / DURABILITY_DIVIDER);
     }
 
     private function reverseHexNumber($number)
