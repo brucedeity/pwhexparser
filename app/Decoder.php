@@ -265,8 +265,8 @@ class Decoder
         $addons = [
             'special_addons' => [],
             'normal_addons' => [],
-            'refine' => [],
-            'socket' => [],
+            'refine_addons' => [],
+            'socket_addons' => [],
         ];
 
         if ($this->addonsCount <= 0) {
@@ -297,7 +297,7 @@ class Decoder
                 ];
 
                 if ($addonId > 1691 && $addonId < 1892) {
-                    $addons['refine'] = $addon;
+                    $addons['refine_addons'] = $addon;
                 } else {
                     $addons['special_addons'][] = $addon;
                 }
@@ -312,7 +312,7 @@ class Decoder
                     'value' => $this->hexToDecimal(substr($this->getHexString(), $addonPos + LINT_SIZE, LINT_SIZE), LINT_SIZE, 0, true),
                 ];
 
-                $addons['socket'][] = $socketAddon;
+                $addons['socket_addons'][] = $socketAddon;
             } else {
                 $addonId = hexdec(substr($hexString, 1));
                 $addon = [
