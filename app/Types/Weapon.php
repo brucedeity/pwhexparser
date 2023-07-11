@@ -31,7 +31,7 @@ class Weapon implements Item
             'max_magic_damage' => 'lint',
             'attack_rate' => 'attack_rate',
             'attack_range' => 'float',
-            'minimum_effective_range' => 'float',
+            'minimum_range' => 'float',
             'sockets_count' => 'sockets_count',
             'sockets' => 'sockets',
             'addons_count' => 'addons_count',
