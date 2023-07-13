@@ -23,6 +23,7 @@ const AVAILABLE_TYPES = [
     'TaskDice',
     'PetFood',
     'SoulStone',
+    'Property'
 ];
 
 const SPECIAL_ADDON = 4;
