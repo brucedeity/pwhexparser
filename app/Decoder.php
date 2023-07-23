@@ -64,6 +64,7 @@ class Decoder
             2097152 => 'Charm',
             2048 => 'Ammo',
             1077936128 => 'BlessBox',
+            1073743360 => 'Jewelry',
             8388608 => 'Pet',
             33554432 => 'Fashion',
             16777216 => 'Genie'
@@ -409,5 +410,17 @@ class Decoder
         }
 
         return intval(base_convert($hexString, 16, 10));
+    }
+
+    public function reset() : void
+    {
+        $this->position = 0;
+        $this->hexString = '';
+        $this->parsedHex = '';
+        $this->nameLength = 0;
+        $this->socketsCount = 0;
+        $this->addonsCount = 0;
+        $this->skillsCount = 0;
+        $this->itemType = null;
     }
 }
