@@ -5,6 +5,7 @@ namespace App;
 require_once 'Constants.php';
 
 use App\Interfaces\Item;
+use App\Types\Unequippable;
 
 class Decoder
 {
@@ -43,6 +44,7 @@ class Decoder
         $types = [
             0 => 'Unequippable',
             1 => 'Weapon',
+            1073741825 => 'Weapon',
             16 => 'Armor',
             64 => 'Armor',
             128 => 'Armor',
@@ -67,7 +69,7 @@ class Decoder
             1073743360 => 'Jewelry',
             8388608 => 'Pet',
             33554432 => 'Fashion',
-            16777216 => 'Genie'
+            16777216 => 'Genie',
         ];
 
         if (!isset($types[$mask]))
@@ -99,6 +101,10 @@ class Decoder
 
     public function decodeHexString(): array
     {
+        if ($this->itemType instanceof Unequippable) {
+            return [];
+        }
+
         $this->validateHex();
 
         $result = [];
@@ -112,6 +118,10 @@ class Decoder
 
     public function debugHexString(): array
     {
+        if ($this->itemType instanceof Unequippable) {
+            return [];
+        }
+
         $this->validateHex();
 
         $result = [];
