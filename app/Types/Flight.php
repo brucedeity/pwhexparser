@@ -22,6 +22,17 @@ class Flight implements Item
         ];
     }
 
+    public function getExtraStructure() : array
+    {
+        return [
+            'level_requirement' => 'lint',
+            'mana_consumption' => 'lint',
+            'mana_per_second' => 'lint',
+            'speed_increase' => 'float',
+            'reserved' => 'lint',
+        ];
+    }
+
     public function getMinimumLength() : int
     {
         return 63;

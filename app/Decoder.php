@@ -104,15 +104,25 @@ class Decoder
         if ($this->itemType instanceof Unequippable) {
             return [];
         }
-
-        $this->validateHex();
-
+    
         $result = [];
-
-        foreach ($this->getItemType()->getStructure() as $field => $type) {
-            $result[$field] = $this->decodeType($field, $type);
+        
+        try {
+            $this->validateHex();
+    
+            foreach ($this->getItemType()->getStructure() as $field => $type) {
+                $result[$field] = $this->decodeType($field, $type);
+            }
+        } catch (\Exception $e) {
+            if (method_exists($this->getItemType(), 'getExtraStructure')) {
+                foreach ($this->getItemType()->getExtraStructure() as $field => $type) {
+                    $result[$field] = $this->decodeType($field, $type);
+                }
+            } else {
+                throw $e;
+            }
         }
-
+    
         return $result;
     }
 
