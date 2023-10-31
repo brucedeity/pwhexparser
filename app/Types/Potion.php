@@ -2,17 +2,17 @@
 
 namespace App\Types;
 
-use App\Interfaces\Item;
+use App\Contracts\Item;
 
 class Potion implements Item
 {
     public function getStructure(): array
     {
         return [
-            'amount' => 'lint',
-            'time' => 'lint',
-            'recharge_time' => 'lint',
-            'level_requirement' => 'lint',
+            'amount' => 'int8',
+            'time' => 'int8',
+            'recharge_time' => 'int8',
+            'level_requirement' => 'int8',
         ];
     }
 

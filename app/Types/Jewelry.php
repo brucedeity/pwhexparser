@@ -2,7 +2,7 @@
 
 namespace App\Types;
 
-use App\Interfaces\Item;
+use App\Contracts\Item;
 
 class Jewelry implements Item
 {
@@ -21,15 +21,15 @@ class Jewelry implements Item
             'item_flag' => 'short',
             'name_length' => 'name_length',
             'name' => 'name',
-            'physical_attack' => 'lint',
-            'magic_attack' => 'lint',
-            'physical_defense' => 'lint',
-            'dodge' => 'lint',
-            'metal_resistance' => 'lint',
-            'wood_resistance' => 'lint',
-            'water_resistance' => 'lint',
-            'fire_resistance' => 'lint',
-            'earth_resistance' => 'lint',
+            'physical_attack' => 'int8',
+            'magic_attack' => 'int8',
+            'physical_defense' => 'int8',
+            'dodge' => 'int8',
+            'metal_resistance' => 'int8',
+            'wood_resistance' => 'int8',
+            'water_resistance' => 'int8',
+            'fire_resistance' => 'int8',
+            'earth_resistance' => 'int8',
             'sockets_count' => 'sockets_count',
             'sockets' => 'sockets',
             'addons_count' => 'addons_count',

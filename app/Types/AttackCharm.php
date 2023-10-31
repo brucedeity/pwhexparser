@@ -2,7 +2,7 @@
 
 namespace App\Types;
 
-use App\Interfaces\Item;
+use App\Contracts\Item;
 
 class AttackCharm implements Item
 {

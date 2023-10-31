@@ -2,34 +2,34 @@
 
 namespace App\Types;
 
-use App\Interfaces\Item;
+use App\Contracts\Item;
 
 class Flight implements Item
 {
     public function getStructure(): array
     {
         return [
-            'fuel1' => 'lint',
-            'fuel2' => 'lint',
+            'fuel1' => 'int8',
+            'fuel2' => 'int8',
             'level_requirement' => 'int',
             'grade' => 'int',
-            'class_requirement' => 'lint',
-            'time_per_element' => 'lint',
+            'class_requirement' => 'int8',
+            'time_per_element' => 'int8',
             'speed1' => 'float',
             'speed2' => 'float',
             'item_flag' => 'int',
-            'crc' => 'lint',
+            'crc' => 'int8',
         ];
     }
 
     public function getExtraStructure() : array
     {
         return [
-            'level_requirement' => 'lint',
-            'mana_consumption' => 'lint',
-            'mana_per_second' => 'lint',
+            'level_requirement' => 'int8',
+            'mana_consumption' => 'int8',
+            'mana_per_second' => 'int8',
             'speed_increase' => 'float',
-            'reserved' => 'lint',
+            'reserved' => 'int8',
         ];
     }
 

@@ -2,15 +2,15 @@
 
 namespace App\Types;
 
-use App\Interfaces\Item;
+use App\Contracts\Item;
 
 class PetFood implements Item
 {
     public function getStructure(): array
     {
         return [
-            'honor' => 'lint',
-            'food_mask' => 'lint',
+            'honor' => 'int8',
+            'food_mask' => 'int8',
         ];
     }
 

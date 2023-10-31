@@ -2,7 +2,7 @@
 
 namespace App\Types;
 
-use App\Interfaces\Item;
+use App\Contracts\Item;
 
 class SoulStone implements Item
 {
@@ -11,7 +11,7 @@ class SoulStone implements Item
         return [
             'w_addons_count' => 'addons_count',
             'addons' => 'addons',
-            // 'level_requirement' => 'lint',
+            // 'level_requirement' => 'int8',
             // 'level_requirement1' => 'int',
             // 'a_addons_count' => 'addons_count',
             // 'level_requirement2' => 'int',

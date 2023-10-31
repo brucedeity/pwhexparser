@@ -2,14 +2,14 @@
 
 namespace App\Types;
 
-use App\Interfaces\Item;
+use App\Contracts\Item;
 
 class TaskDice implements Item
 {
     public function getStructure(): array
     {
         return [
-            'quest_id' => 'lint',
+            'quest_id' => 'int8',
         ];
     }
 

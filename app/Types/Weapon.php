@@ -2,7 +2,7 @@
 
 namespace App\Types;
 
-use App\Interfaces\Item;
+use App\Contracts\Item;
 
 class Weapon implements Item
 {
@@ -21,14 +21,14 @@ class Weapon implements Item
             'item_flag' => 'short',
             'name_length' => 'name_length',
             'name' => 'name',
-            'ranged_type' => 'lint',
-            'weapon_type' => 'lint',
-            'weapon_grade' => 'lint',
-            'ammunition_type' => 'lint',
-            'min_physical_damage' => 'lint',
-            'max_physical_damage' => 'lint',
-            'min_magic_damage' => 'lint',
-            'max_magic_damage' => 'lint',
+            'ranged_type' => 'int8',
+            'weapon_type' => 'int8',
+            'weapon_grade' => 'int8',
+            'ammunition_type' => 'int8',
+            'min_physical_damage' => 'int8',
+            'max_physical_damage' => 'int8',
+            'min_magic_damage' => 'int8',
+            'max_magic_damage' => 'int8',
             'attack_rate' => 'attack_rate',
             'attack_range' => 'float',
             'minimum_range' => 'float',

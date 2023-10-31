@@ -2,14 +2,14 @@
 
 namespace App\Types;
 
-use App\Interfaces\Item;
+use App\Contracts\Item;
 
 class Charm implements Item
 {
     public function getStructure(): array
     {
         return [
-            'total' => 'lint',
+            'total' => 'int8',
             'trigger' => 'float',
         ];
     }

@@ -2,21 +2,21 @@
 
 namespace App\Types;
 
-use App\Interfaces\Item;
+use App\Contracts\Item;
 
 class Card implements Item
 {
     public function getStructure(): array
     {
         return [
-            'type' => 'lint',
-            'class' => 'lint',
-            'level_requirement' => 'lint',
-            'leadership' => 'lint',
-            'max_level' => 'lint',
-            'current_level' => 'lint',
-            'current_exp' => 'lint',
-            'merge_times' => 'lint',
+            'type' => 'int8',
+            'class' => 'int8',
+            'level_requirement' => 'int8',
+            'leadership' => 'int8',
+            'max_level' => 'int8',
+            'current_level' => 'int8',
+            'current_exp' => 'int8',
+            'merge_times' => 'int8',
         ];
     }
 

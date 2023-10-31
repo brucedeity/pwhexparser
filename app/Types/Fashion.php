@@ -2,14 +2,14 @@
 
 namespace App\Types;
 
-use App\Interfaces\Item;
+use App\Contracts\Item;
 
 class Fashion implements Item
 {
     public function getStructure(): array
     {
         return [
-            'level_req' => 'lint',
+            'level_req' => 'int8',
             'color' => 'int',
             'gender' => 'int',
             'creator_type' => 'short',

@@ -2,14 +2,14 @@
 
 namespace App\Types;
 
-use App\Interfaces\Item;
+use App\Contracts\Item;
 
 class Genie implements Item
 {
     public function getStructure(): array
     {
         return [
-            'current_exp' => 'lint',
+            'current_exp' => 'int8',
             'level' => 'int',
             'available_points' => 'int',
             'strength' => 'int',
@@ -23,9 +23,9 @@ class Genie implements Item
             'fire' => 'int',
             'earth' => 'int',
             'refine_level' => 'int',
-            'vigour' => 'lint',
-            'status_value' => 'lint',
-            'equipments_count' => 'lint',
+            'vigour' => 'int8',
+            'status_value' => 'int8',
+            'equipments_count' => 'int8',
             'skills_count' => 'skills_count',
             // 'skills' => 'skills', TODO
         ];
