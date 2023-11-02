@@ -3,8 +3,9 @@
 namespace App\Types;
 
 use App\Contracts\Item;
+use App\Contracts\Translate;
 
-class BlessBox implements Item
+class BlessBox extends Translate implements Item
 {
     public function getStructure(): array
     {

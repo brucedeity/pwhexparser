@@ -2,19 +2,22 @@
 
 namespace App;
 
-use App\Contracts\Item;
+use App\Contracts\Translate;
 use App\Types\Unequippable;
+use Exception;
+use App\Mask;
 
 class Decoder
 {
     private $position = 0;
     private $hexString = '';
     private $parsedHex = '';
+    private $lang = 'pt-BR';
     private $nameLength = 0;
     private $socketsCount = 0;
     private $addonsCount = 0;
     private $skillsCount = 0;
-    private $itemType;
+    private Translate $itemType;
 
     const SHORT = 2;
     const INT = 4;
@@ -24,12 +27,47 @@ class Decoder
     const SPECIAL_ADDON_ID = 4;
     const SOCKET_ADDON_ID = 'a';
     const DURABILITY_DIVIDER = 100;
-    const ITEM_TYPES = [0 => 'Unequippable',1 => 'Weapon',2 => 'Armor',4 => 'Jewelry',8 => 'Armor',16 => 'Armor',32 => 'Fashion',64 => 'Armor',128 => 'Armor',256 => 'Armor',1536 => 'Jewelry',2048 => 'Ammo',4096 => 'Flight',8192 => 'Fashion',16384 => 'Fashion',65536 => 'Fashion',262144 => 'Card',32768 => 'Fashion',524288 => 'Fashion',131072 => 'AttackCharm',1048576 => 'Charm',2097152 => 'Charm',8388608 => 'Pet',33554432 => 'Fashion',16777216 => 'Genie',1077936128 => 'BlessBox',1073741825 => 'Weapon',1073743360 => 'Jewelry'];
-    const AVAILABLE_ITEM_TYPES = ['Weapon','Armor','Jewelry','Pet','Fashion','Card','Flight','BlessBox','Genie','Charm','AttackCharm','Ammo','Potion','TaskDice','PetFood','SoulStone','Property','Unequippable'];
     
     public function sethexString(string $hexString): void
     {
         $this->hexString = $hexString;
+    }
+
+    public function setLang(string $lang = 'pt-BR') : void
+    {
+        $this->getItemType()->setLang($lang);
+    }
+
+    public function translate()
+    {
+        try {
+            $structure = $this->getItemType()->getTranslatedStructure();
+            $values = $this->decodeHexString();
+            $result = [];
+
+            foreach ($structure as $field => $translatedField) {
+                if (is_array($translatedField)) {
+                    if (
+                        isset($translatedField['name'], $translatedField['values'][0], $translatedField['values'][1]) &&
+                        isset($values[$translatedField['values'][0]], $values[$translatedField['values'][1]])
+                    ) {
+                        $result[$translatedField['name']] = $values[$translatedField['values'][0]] . $translatedField['separator'] . $values[$translatedField['values'][1]];
+                    } else {
+                        throw new Exception("Invalid structure or missing values for translation");
+                    }
+                } else {
+                    if (isset($values[$field])) {
+                        $result[$translatedField] = $values[$field];
+                    } else {
+                        throw new Exception("Missing value for field: $field");
+                    }
+                }
+            }
+
+            return $result;
+        } catch (Exception $e) {
+            return ['error' => $e->getMessage()];
+        }
     }
 
     public function gethexString(): string
@@ -37,11 +75,21 @@ class Decoder
         return $this->hexString;
     }
 
+    private function validateItemType(string $type) : bool
+    {
+        foreach (Mask::getEquipmentTypes() as $key => $availableType)
+        {
+            if ($availableType === $type) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     public function setItemType(string $itemType): void
     {
-        if (!in_array($itemType, self::AVAILABLE_ITEM_TYPES)) {
-            throw new \Exception('Error when trying to set an invalid item type: ' . $itemType);
-        }
+        if (!$this->validateItemType($itemType)) throw new Exception('Invalid item type: ' . $itemType);
 
         $itemTypeObject = 'App\Types\\' . $itemType;
 
@@ -50,14 +98,12 @@ class Decoder
 
     public function guessItemType(int $mask) : void
     {
-        if (!isset(self::ITEM_TYPES[$mask])) {
-            throw new \Exception('Unable to guess item type from mask: ' . $mask);
-        }
+        $type = Mask::getEquipmentTypeFromMask($mask);
 
-        $this->setItemType(self::ITEM_TYPES[$mask]);
+        $this->setItemType($type);
     }
 
-    public function getItemType(): Item
+    public function getItemType(): Translate
     {
         return $this->itemType;
     }
@@ -65,16 +111,16 @@ class Decoder
     private function validateHex(): void
     {
         if (empty($this->getHexString())) {
-            throw new \Exception('Hex string not set, please use setHexString() method before calling validateHex()');
+            throw new Exception('Hex string not set, please use setHexString() method before calling validateHex()');
         }
         elseif (!ctype_xdigit($this->getHexString())) {
-            throw new \Exception('Invalid hexadecimal string for type '. get_class($this->itemType));
+            throw new Exception('Invalid hexadecimal string for type '. get_class($this->itemType));
         }
         elseif ($this->getItemType() === null) {
-            throw new \Exception('Item type not set, please use setItemType() method before calling decodeHexString()');
+            throw new Exception('Item type not set, please use setItemType() method before calling decodeHexString()');
         }
         elseif (strlen($this->getHexString()) < $this->getItemType()->getMinimumLength()) {
-            throw new \Exception('Hex string is too short for ' . get_class($this->itemType) . ', given: ' . strlen($this->getHexString()) . ', expected: ' . $this->getItemType()->getMinimumLength() . '');
+            throw new Exception('Hex string is too short for ' . get_class($this->itemType) . ', given: ' . strlen($this->getHexString()) . ', expected: ' . $this->getItemType()->getMinimumLength() . '');
         }
     }    
 
@@ -92,7 +138,7 @@ class Decoder
             foreach ($this->getItemType()->getStructure() as $field => $type) {
                 $result[$field] = $this->decodeType($field, $type);
             }
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             if (method_exists($this->getItemType(), 'getExtraStructure')) {
                 foreach ($this->getItemType()->getExtraStructure() as $field => $type) {
                     $result[$field] = $this->decodeType($field, $type);
@@ -255,7 +301,7 @@ class Decoder
         $this->addonsCount = $this->decodeType($field, 'int8');
 
         if ($this->addonsCount > 30)
-            throw new \Exception('Invalid addons count, max value is 30, got ' . $this->addonsCount . ' instead');
+            throw new Exception('Invalid addons count, max value is 30, got ' . $this->addonsCount . ' instead');
 
         return $this->addonsCount;
     }
@@ -342,7 +388,7 @@ class Decoder
         if ($this->socketsCount <= 0) {
             return $sockets;
         } elseif ($this->socketsCount > self::MAX_SOCKETS_COUNT) {
-            throw new \Exception('Invalid sockets count, max value is '.self::MAX_SOCKETS_COUNT.', got ' . $this->socketsCount . ' instead');
+            throw new Exception('Invalid sockets count, max value is '.self::MAX_SOCKETS_COUNT.', got ' . $this->socketsCount . ' instead');
         }
 
         for ($i = 0; $i < $this->socketsCount; $i++) {
