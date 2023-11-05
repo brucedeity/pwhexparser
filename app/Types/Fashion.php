@@ -10,7 +10,7 @@ class Fashion extends Translate implements Item
     public function getStructure(): array
     {
         return [
-            'level_req' => 'int8',
+            'level' => 'int8',
             'color' => 'int',
             'gender' => 'int',
             'creator_type' => 'short',

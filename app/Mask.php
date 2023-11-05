@@ -65,9 +65,14 @@ class Mask
         return $flags;
     }
 
-    public static function getEquipmentTypeFromMask(int $mask) : int
+    public static function getEquipmentTypeFromMask(int $mask) : string
     {
+        if ($mask === 0) {
+            return 'Unequippable';
+        }
+
         $maskFlags = self::decode($mask);
+
         $type = $maskFlags[0] ?? null;
 
         if (!defined("self::$type")) {
@@ -75,7 +80,7 @@ class Mask
         }
 
         $value = constant("self::$type");
-        return self::getEquipmentTypes()[$value] ?? 0;
+        return self::getEquipmentTypes()[$value] ?? 'Unknown';
     }
 
     public static function getEquipmentTypes() : array
@@ -101,8 +106,8 @@ class Mask
             self::ATTACK_RUNE => 'AttackCharm',
             self::BIBLE => 'Bible',
             self::BUGLE => 'Bugle',
-            self::HP_ADDON => 'Charm',
-            self::MP_ADDON => 'Charm',
+            self::HP_ADDON => 'HpAddon',
+            self::MP_ADDON => 'MpAddon',
             self::TWEAK => 'Armor',
             self::ELF => 'Genie',
             self::STALLCARD => 'StallCard',

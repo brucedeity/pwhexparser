@@ -4,6 +4,8 @@ namespace App;
 
 use App\Contracts\Translate;
 use App\Types\Unequippable;
+use App\Types\Bible;
+use App\Types\DynSKill;
 use Exception;
 use App\Mask;
 
@@ -27,7 +29,7 @@ class Decoder
     const SPECIAL_ADDON_ID = 4;
     const SOCKET_ADDON_ID = 'a';
     const DURABILITY_DIVIDER = 100;
-    
+
     public function sethexString(string $hexString): void
     {
         $this->hexString = $hexString;
@@ -51,13 +53,19 @@ class Decoder
                         isset($translatedField['name'], $translatedField['values'][0], $translatedField['values'][1]) &&
                         isset($values[$translatedField['values'][0]], $values[$translatedField['values'][1]])
                     ) {
-                        $result[$translatedField['name']] = $values[$translatedField['values'][0]] . $translatedField['separator'] . $values[$translatedField['values'][1]];
+                        $result[$field] = [
+                            'translated' => $translatedField['name'],
+                            'value' => $values[$translatedField['values'][0]] . $translatedField['separator'] . $values[$translatedField['values'][1]]
+                        ];
                     } else {
                         throw new Exception("Invalid structure or missing values for translation");
                     }
                 } else {
                     if (isset($values[$field])) {
-                        $result[$translatedField] = $values[$field];
+                        $result[$field] = [
+                            'translated' => $translatedField,
+                            'value' => $values[$field]
+                        ];
                     } else {
                         throw new Exception("Missing value for field: $field");
                     }
@@ -89,7 +97,7 @@ class Decoder
 
     public function setItemType(string $itemType): void
     {
-        if (!$this->validateItemType($itemType)) throw new Exception('Invalid item type: ' . $itemType);
+        if (!$this->validateItemType($itemType) && $itemType != 'Property') throw new Exception('Invalid item type: ' . $itemType);
 
         $itemTypeObject = 'App\Types\\' . $itemType;
 
@@ -111,7 +119,7 @@ class Decoder
     private function validateHex(): void
     {
         if (empty($this->getHexString())) {
-            throw new Exception('Hex string not set, please use setHexString() method before calling validateHex()');
+            throw new Exception('Hex string not set, please use setHexString() method before calling validateHex(). Item type: '. get_class($this->itemType));
         }
         elseif (!ctype_xdigit($this->getHexString())) {
             throw new Exception('Invalid hexadecimal string for type '. get_class($this->itemType));
@@ -122,19 +130,19 @@ class Decoder
         elseif (strlen($this->getHexString()) < $this->getItemType()->getMinimumLength()) {
             throw new Exception('Hex string is too short for ' . get_class($this->itemType) . ', given: ' . strlen($this->getHexString()) . ', expected: ' . $this->getItemType()->getMinimumLength() . '');
         }
-    }    
+    }
 
     public function decodeHexString(): array
     {
-        if ($this->itemType instanceof Unequippable) {
+        if ($this->itemType instanceof Unequippable || $this->itemType instanceof Bible || $this->itemType instanceof DynSKill) {
             return [];
         }
-    
+
         $result = [];
-        
+
         try {
             $this->validateHex();
-    
+
             foreach ($this->getItemType()->getStructure() as $field => $type) {
                 $result[$field] = $this->decodeType($field, $type);
             }
@@ -147,13 +155,13 @@ class Decoder
                 throw $e;
             }
         }
-    
+
         return $result;
     }
 
     public function debugHexString(): array
     {
-        if ($this->itemType instanceof Unequippable) {
+        if ($this->itemType instanceof Unequippable ) {
             return [];
         }
 
@@ -284,10 +292,10 @@ class Decoder
         $name = '';
 
         $initialPos = $this->position + self::INT;
-        
+
         for ($i = 0; $i < $this->nameLength; $i++) {
             $parsedHex = substr($this->getHexString(), $initialPos + $i * self::INT + self::SHORT, self::SHORT);
-            
+
             $name .= pack("H*", $parsedHex);
         }
 

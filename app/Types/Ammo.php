@@ -10,7 +10,7 @@ class Ammo extends Translate implements Item
     public function getStructure(): array
     {
         return [
-            'level_requirement' => 'int',
+            'level' => 'int',
             'required_class' => 'int',
             'strength_requirement' => 'int',
             'constitution_requirement' => 'int',

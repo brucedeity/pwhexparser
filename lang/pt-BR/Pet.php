@@ -1,14 +1,5 @@
 <?php
 
-namespace App\Types;
-
-use App\Contracts\Item;
-use App\Contracts\Translate;
-
-class Pet extends Translate implements Item
-{
-    public function getStructure(): array
-    {
         return [
             'level' => 'int8',
             'required_class' => 'int8',
@@ -26,10 +17,3 @@ class Pet extends Translate implements Item
             'skills_count' => 'skills_count',
             'skills' => 'skills',
         ];
-    }
-
-    public function getMinimumLength() : int
-    {
-        return 119;
-    }
-}

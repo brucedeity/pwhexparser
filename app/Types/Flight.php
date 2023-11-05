@@ -12,9 +12,9 @@ class Flight extends Translate implements Item
         return [
             'fuel1' => 'int8',
             'fuel2' => 'int8',
-            'level_requirement' => 'int',
+            'level' => 'int',
             'grade' => 'int',
-            'class_requirement' => 'int8',
+            'class' => 'int8',
             'time_per_element' => 'int8',
             'speed1' => 'float',
             'speed2' => 'float',
@@ -26,7 +26,7 @@ class Flight extends Translate implements Item
     public function getExtraStructure() : array
     {
         return [
-            'level_requirement' => 'int8',
+            'level' => 'int8',
             'mana_consumption' => 'int8',
             'mana_per_second' => 'int8',
             'speed_increase' => 'float',
