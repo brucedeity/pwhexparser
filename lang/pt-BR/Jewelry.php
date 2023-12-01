@@ -1,17 +1,17 @@
 <?php
 
         return [
-            'item_flag' => '',
+            // 'item_flag' => '',
             'item_type' => 'item_type',
             'physical_attack' => 'Ataque físico',
             'magic_attack' => 'Ataque mágico',
             'physical_defense' => 'Def.',
             'dodge' => 'Esquiva',
-            'metal_resistance' => 'Def Metal',
-            'wood_resistance' => 'Def Madeira',
-            'water_resistance' => 'Def Água',
-            'fire_resistance' => 'Def fogo',
-            'earth_resistance' => 'Def Terra',
+            'metal_resistance' => 'Def Metal +',
+            'wood_resistance' => 'Def Madeira +',
+            'water_resistance' => 'Def Água +',
+            'fire_resistance' => 'Def fogo +',
+            'earth_resistance' => 'Def Terra +',
             'durability' => [
                 'name' => 'Durabilidade',
                 'values' => [
