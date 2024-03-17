@@ -23,7 +23,7 @@
             'strength' => 'For. necessária:',
             'vitality' => 'Con. necessária:',
             'dexterity' => 'Des. necessária:',
-            'magic' => 'Int.',
+            'magic' => 'Int necessária:',
             'evasion' => 'Esquiva',
             'sockets_count' => 'sockets_count',
             'sockets' => 'sockets',
