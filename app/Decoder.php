@@ -444,7 +444,7 @@ class Decoder
         return $float_value;
     }
 
-    private function hexToDecimal(string $hexString, int $expectedLength, mixed $prefixToRemove = 0, bool $reverse = true)
+    private function hexToDecimal(string $hexString, int $expectedLength, mixed $prefixToRemove = NULL, bool $reverse = true)
     {
         $paddingLength = $expectedLength - strlen($hexString);
 
