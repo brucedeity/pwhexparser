@@ -99,6 +99,8 @@ class Decoder
 
         if ($itemType == 'Property') {
             $this->itemType = new Property;
+
+            return;
         }
 
         $this->itemType = $this->validateItemType($itemType) ? new $itemTypeObject() : new Unequippable;
