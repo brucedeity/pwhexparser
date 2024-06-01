@@ -2,10 +2,9 @@
 
 namespace App\Types;
 
-use App\Contracts\Item;
-use App\Contracts\Translate;
+use App\Types\Unequippable;
 
-class Bible extends Translate implements Item
+class Bible extends Unequippable
 {
     public function getStructure(): array
     {

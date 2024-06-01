@@ -2,10 +2,10 @@
 
 namespace App\Types;
 
-use App\Contracts\Item;
-use App\Contracts\Translate;
 
-class PetFood extends Translate implements Item
+use App\Contracts\Translatable;
+
+class PetFood extends Translatable
 {
     public function getStructure(): array
     {

@@ -2,10 +2,9 @@
 
 namespace App\Types;
 
-use App\Contracts\Item;
-use App\Contracts\Translate;
+use App\Contracts\Translatable;
 
-class AttackCharm extends Translate implements Item
+class AttackCharm extends Translatable
 {
     public function getStructure(): array
     {

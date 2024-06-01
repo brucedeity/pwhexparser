@@ -2,11 +2,8 @@
 
 namespace App;
 
-use App\Contracts\Translate;
+use App\Contracts\Translatable;
 use App\Types\Unequippable;
-use App\Types\Bible;
-use App\Types\DynSKill;
-use Exception;
 use App\Mask;
 
 class Decoder
@@ -19,11 +16,11 @@ class Decoder
     private $socketsCount = 0;
     private $addonsCount = 0;
     private $skillsCount = 0;
-    private Translate $itemType;
+    private Translatable $itemType;
 
-    const SHORT = 2;
-    const INT = 4;
-    const INT8 = 8;
+    const SHORT_SIZE = 2;
+    const INT_SIZE = 4;
+    const INT8_SIZE = 8;
     const MAX_SOCKETS_COUNT = 4;
     const ATTACK_RATE_FACTOR = 20;
     const SPECIAL_ADDON_ID = 4;
@@ -58,7 +55,7 @@ class Decoder
                             'value' => $values[$translatedField['values'][0]] . $translatedField['separator'] . $values[$translatedField['values'][1]]
                         ];
                     } else {
-                        throw new Exception("Invalid structure or missing values for translation");
+                        throw new \Exception("Invalid structure or missing values for translation");
                     }
                 } else {
                     if (isset($values[$field])) {
@@ -67,13 +64,13 @@ class Decoder
                             'value' => $values[$field]
                         ];
                     } else {
-                        throw new Exception("Missing value for field: $field");
+                        throw new \Exception("Missing value for field: $field");
                     }
                 }
             }
 
             return $result;
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             return ['error' => $e->getMessage()];
         }
     }
@@ -85,7 +82,7 @@ class Decoder
 
     private function validateItemType(string $type) : bool
     {
-        foreach (Mask::getEquipmentTypes() as $key => $availableType)
+        foreach (Mask::getEquipmentTypes() as $availableType)
         {
             if ($availableType === $type) {
                 return true;
@@ -97,11 +94,8 @@ class Decoder
 
     public function setItemType(string $itemType): void
     {
-        if (!$this->validateItemType($itemType) && $itemType != 'Property') throw new Exception('Invalid item type: ' . $itemType);
-
         $itemTypeObject = 'App\Types\\' . $itemType;
-
-        $this->itemType = new $itemTypeObject();
+        $this->itemType = $this->validateItemType($itemType) ? new $itemTypeObject() : new Unequippable();
     }
 
     public function guessItemType(int $mask) : void
@@ -111,7 +105,7 @@ class Decoder
         $this->setItemType($type);
     }
 
-    public function getItemType(): Translate
+    public function getItemType(): Translatable
     {
         return $this->itemType;
     }
@@ -119,22 +113,22 @@ class Decoder
     private function validateHex(): void
     {
         if (empty($this->getHexString())) {
-            throw new Exception('Hex string not set, please use setHexString() method before calling validateHex(). Item type: '. get_class($this->itemType));
+            throw new \Exception('Hex string not set, please use setHexString() method before calling validateHex(). Item type: '. get_class($this->itemType));
         }
         elseif (!ctype_xdigit($this->getHexString())) {
-            throw new Exception('Invalid hexadecimal string for type '. get_class($this->itemType));
+            throw new \Exception('Invalid hexadecimal string for type '. get_class($this->itemType));
         }
         elseif ($this->getItemType() === null) {
-            throw new Exception('Item type not set, please use setItemType() method before calling decode()');
+            throw new \Exception('Item type not set, please use setItemType() method before calling decode()');
         }
-        elseif (strlen($this->getHexString()) < $this->getItemType()->getMinimumLength()) {
-            throw new Exception('Hex string is too short for ' . get_class($this->itemType) . ', given: ' . strlen($this->getHexString()) . ', expected: ' . $this->getItemType()->getMinimumLength() . '');
+        elseif ($this->getItemType() instanceof Translatable && strlen($this->getHexString()) < $this->getItemType()->getMinimumLength()) {
+            throw new \Exception('Hex string is too short for ' . get_class($this->itemType) . ', given: ' . strlen($this->getHexString()) . ', expected: ' . $this->getItemType()->getMinimumLength() . '');
         }
     }
 
     public function decode(): array
     {
-        if ($this->itemType instanceof Unequippable || $this->itemType instanceof Bible || $this->itemType instanceof DynSKill) {
+        if ($this->itemType instanceof Unequippable) {
             return [];
         }
 
@@ -143,11 +137,15 @@ class Decoder
         try {
             $this->validateHex();
 
-            foreach ($this->getItemType()->getStructure() as $field => $type) {
-                $result[$field] = $this->decodeType($field, $type);
+            if ($this->getItemType() instanceof Translatable) {
+                foreach ($this->getItemType()->getStructure() as $field => $type) {
+                    $result[$field] = $this->decodeType($field, $type);
+                }
+            } else {
+                throw new \Exception('Invalid item type: ' . get_class($this->getItemType()));
             }
-        } catch (Exception $e) {
-            if (method_exists($this->getItemType(), 'getExtraStructure')) {
+        } catch (\Exception $e) {
+            if ($this->getItemType() instanceof Translatable) {
                 foreach ($this->getItemType()->getExtraStructure() as $field => $type) {
                     $result[$field] = $this->decodeType($field, $type);
                 }
@@ -217,30 +215,30 @@ class Decoder
                 return $this->getDurability($field);
 
             case 'int':
-                $hex = substr($this->getHexString(), $this->position, self::INT);
+                $hex = substr($this->getHexString(), $this->position, self::INT_SIZE);
                 $this->parsedHex = $hex;
-                $this->position += self::INT;
-                return $this->hexToDecimal($hex, self::INT, $prefixToRemove, true);
+                $this->position += self::INT_SIZE;
+                return $this->hexToDecimal($hex, self::INT_SIZE, $prefixToRemove, true);
 
             case 'int8':
-                $hex = substr($this->getHexString(), $this->position, self::INT8);
+                $hex = substr($this->getHexString(), $this->position, self::INT8_SIZE);
                 $this->parsedHex = $hex;
-                $this->position += self::INT8;
-                return $this->hexToDecimal($hex, self::INT8, $prefixToRemove, true);
+                $this->position += self::INT8_SIZE;
+                return $this->hexToDecimal($hex, self::INT8_SIZE, $prefixToRemove, true);
 
             case 'short':
-                $hex = substr($this->getHexString(), $this->position, self::SHORT);
+                $hex = substr($this->getHexString(), $this->position, self::SHORT_SIZE);
                 $this->parsedHex = $hex;
-                $value = $this->hexToDecimal($hex, self::SHORT, $prefixToRemove, true);
+                $value = $this->hexToDecimal($hex, self::SHORT_SIZE, $prefixToRemove, true);
 
-                $this->position += self::SHORT;
+                $this->position += self::SHORT_SIZE;
                 return $value;
 
             case 'float':
-                $hex = substr($this->getHexString(), $this->position, self::INT8);
+                $hex = substr($this->getHexString(), $this->position, self::INT8_SIZE);
 
                 $this->parsedHex = $hex;
-                $this->position += self::INT8;
+                $this->position += self::INT8_SIZE;
                 return $this->toFloat($hex);
         }
     }
@@ -248,7 +246,7 @@ class Decoder
     private function getSkillsCount(string $field) : int
     {
         $this->skillsCount = $this->decodeType($field, 'int');
-        $this->position += (self::INT * 4);
+        $this->position += (self::INT_SIZE * 4);
 
         return $this->skillsCount;
     }
@@ -259,11 +257,11 @@ class Decoder
 
         for ($i = 0; $i < $this->skillsCount; $i++) {
 
-            $skillPos = $this->position + (self::INT * 4) + ($i * (self::INT * 4));
+            $skillPos = $this->position + (self::INT_SIZE * 4) + ($i * (self::INT_SIZE * 4));
 
             $skill = [
-                'id' => $this->hexToDecimal(substr($this->getHexString(), $skillPos, self::INT8), self::INT8, 0, true),
-                'level' => $this->hexToDecimal(substr($this->getHexString(), $skillPos + self::INT8, self::INT8), self::INT8, 0, true),
+                'id' => $this->hexToDecimal(substr($this->getHexString(), $skillPos, self::INT8_SIZE), self::INT8_SIZE, 0, true),
+                'level' => $this->hexToDecimal(substr($this->getHexString(), $skillPos + self::INT8_SIZE, self::INT8_SIZE), self::INT8_SIZE, 0, true),
             ];
 
             array_push($skills, $skill);
@@ -279,10 +277,10 @@ class Decoder
         $nameLength = $this->nameLength / 2;
 
         for ($i = 0; $i < $nameLength; $i++) {
-            $name .= chr($this->hexToDecimal(substr($this->getHexString(), $this->position + $i * self::INT, 2), 2, 0, true));
+            $name .= chr($this->hexToDecimal(substr($this->getHexString(), $this->position + $i * self::INT_SIZE, 2), 2, 0, true));
         }
 
-        $this->position += $nameLength * self::INT;
+        $this->position += $nameLength * self::INT_SIZE;
 
         return $name;
     }
@@ -291,15 +289,15 @@ class Decoder
     {
         $name = '';
 
-        $initialPos = $this->position + self::INT;
+        $initialPos = $this->position + self::INT_SIZE;
 
         for ($i = 0; $i < $this->nameLength; $i++) {
-            $parsedHex = substr($this->getHexString(), $initialPos + $i * self::INT + self::SHORT, self::SHORT);
+            $parsedHex = substr($this->getHexString(), $initialPos + $i * self::INT_SIZE + self::SHORT_SIZE, self::SHORT_SIZE);
 
             $name .= pack("H*", $parsedHex);
         }
 
-        $this->position += self::SHORT;
+        $this->position += self::SHORT_SIZE;
 
         return $name;
     }
@@ -309,7 +307,7 @@ class Decoder
         $this->addonsCount = $this->decodeType($field, 'int8');
 
         if ($this->addonsCount > 30)
-            throw new Exception('Invalid addons count, max value is 30, got ' . $this->addonsCount . ' instead');
+            throw new \Exception('Invalid addons count, max value is 30, got ' . $this->addonsCount . ' instead');
 
         return $this->addonsCount;
     }
@@ -331,8 +329,8 @@ class Decoder
         $shift = 0;
 
         for ($i = 0; $i < $this->addonsCount; $i++) {
-            $addonPos = $this->position + $i * (self::INT * 4) + $shift;
-            $hexString = substr($this->getHexString(), $addonPos, self::INT8);
+            $addonPos = $this->position + $i * (self::INT_SIZE * 4) + $shift;
+            $hexString = substr($this->getHexString(), $addonPos, self::INT8_SIZE);
             $hexString = ltrim($this->reverseHexNumber($hexString), '0');
 
             if (strlen($hexString) % 2 != 0) {
@@ -343,11 +341,11 @@ class Decoder
             $addonType = substr($hexString, 0, 1);
 
             if ($addonType == self::SPECIAL_ADDON_ID) {
-                $addonId = $this->hexToDecimal($hexString, self::INT8, $addonType, false);
+                $addonId = $this->hexToDecimal($hexString, self::INT8_SIZE, $addonType, false);
                 $addon = [
                     'id' => $addonId,
-                    'value' => $this->hexToDecimal(substr($this->getHexString(), $addonPos + self::INT8, self::INT8), self::INT8, 0, true),
-                    'level' => $this->hexToDecimal(substr($this->getHexString(), $addonPos + (self::INT * 4), self::INT8), self::INT8, 0, true),
+                    'value' => $this->hexToDecimal(substr($this->getHexString(), $addonPos + self::INT8_SIZE, self::INT8_SIZE), self::INT8_SIZE, 0, true),
+                    'level' => $this->hexToDecimal(substr($this->getHexString(), $addonPos + (self::INT_SIZE * 4), self::INT8_SIZE), self::INT8_SIZE, 0, true),
                 ];
 
                 if ($addonId > 1691 && $addonId < 1892) {
@@ -356,14 +354,14 @@ class Decoder
                     $addons['special_addons'][] = $addon;
                 }
 
-                $shift += self::INT8;
+                $shift += self::INT8_SIZE;
             } elseif ($addonType == self::SOCKET_ADDON_ID) {
                 $socketIndex++;
-                $addonId = $this->hexToDecimal($hexString, self::INT8, $addonType, false);
+                $addonId = $this->hexToDecimal($hexString, self::INT8_SIZE, $addonType, false);
                 $socketAddon = [
                     'index' => $socketIndex,
                     'id' => $addonId,
-                    'value' => $this->hexToDecimal(substr($this->getHexString(), $addonPos + self::INT8, self::INT8), self::INT8, 0, true),
+                    'value' => $this->hexToDecimal(substr($this->getHexString(), $addonPos + self::INT8_SIZE, self::INT8_SIZE), self::INT8_SIZE, 0, true),
                 ];
 
                 $addons['socket_addons'][] = $socketAddon;
@@ -371,7 +369,7 @@ class Decoder
                 $addonId = hexdec(substr($hexString, 1));
                 $addon = [
                     'id' => $addonId,
-                    'value' => intval($this->hexToDecimal(substr($this->getHexString(), $addonPos + self::INT8, self::INT8), self::INT8, 0, true), 10),
+                    'value' => intval($this->hexToDecimal(substr($this->getHexString(), $addonPos + self::INT8_SIZE, self::INT8_SIZE), self::INT8_SIZE, 0, true), 10),
                 ];
 
                 $addons['normal_addons'][] = $addon;
@@ -384,7 +382,7 @@ class Decoder
     private function getSocketsCount(string $field): int
     {
         $this->socketsCount = $this->decodeType($field, 'int');
-        $this->position += self::INT;
+        $this->position += self::INT_SIZE;
 
         return $this->socketsCount;
     }
@@ -396,12 +394,12 @@ class Decoder
         if ($this->socketsCount <= 0) {
             return $sockets;
         } elseif ($this->socketsCount > self::MAX_SOCKETS_COUNT) {
-            throw new Exception('Invalid sockets count, max value is '.self::MAX_SOCKETS_COUNT.', got ' . $this->socketsCount . ' instead');
+            throw new \Exception('Invalid sockets count, max value is '.self::MAX_SOCKETS_COUNT.', got ' . $this->socketsCount . ' instead');
         }
 
         for ($i = 0; $i < $this->socketsCount; $i++) {
-            $hex = $this->position + $i * self::INT8;
-            $hex = substr($this->getHexString(), $hex, self::INT8);
+            $hex = $this->position + $i * self::INT8_SIZE;
+            $hex = substr($this->getHexString(), $hex, self::INT8_SIZE);
 
             $sockets[$i] = $this->decodeType($hex, 'int8');
         }

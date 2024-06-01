@@ -2,7 +2,7 @@
 
 namespace App\Contracts;
 
-abstract class Translate
+abstract class Translatable implements Item
 {
     private string $lang = 'pt-BR';
 
