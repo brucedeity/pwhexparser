@@ -1,6 +1,6 @@
 # PWHexParser
 
-![Example Usage](images/example.png | width=300)
+<img src="images/example.jpg" width="300">
 
 This project decodes PW's hexadecimal strings based on their predefined structure. For example, it can transform the hex string `0100ff010500000005000000f00a0000f00a00002c00030000000000010000000000000000000000030000000500000000000000000000001000000000004040000000000000000000000000` into the content shown in the image above.
 
