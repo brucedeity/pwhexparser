@@ -44,7 +44,7 @@ class Decoder
     {
         try {
             $structure = $this->getItemType()->getTranslatedStructure();
-            $values = $this->decodeHexString();
+            $values = $this->decode();
             $result = [];
 
             foreach ($structure as $field => $translatedField) {
@@ -125,14 +125,14 @@ class Decoder
             throw new Exception('Invalid hexadecimal string for type '. get_class($this->itemType));
         }
         elseif ($this->getItemType() === null) {
-            throw new Exception('Item type not set, please use setItemType() method before calling decodeHexString()');
+            throw new Exception('Item type not set, please use setItemType() method before calling decode()');
         }
         elseif (strlen($this->getHexString()) < $this->getItemType()->getMinimumLength()) {
             throw new Exception('Hex string is too short for ' . get_class($this->itemType) . ', given: ' . strlen($this->getHexString()) . ', expected: ' . $this->getItemType()->getMinimumLength() . '');
         }
     }
 
-    public function decodeHexString(): array
+    public function decode(): array
     {
         if ($this->itemType instanceof Unequippable || $this->itemType instanceof Bible || $this->itemType instanceof DynSKill) {
             return [];
@@ -474,6 +474,5 @@ class Decoder
         $this->socketsCount = 0;
         $this->addonsCount = 0;
         $this->skillsCount = 0;
-        $this->itemType = null;
     }
 }
