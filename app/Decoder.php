@@ -3,6 +3,7 @@
 namespace App;
 
 use App\Contracts\Translatable;
+use App\Types\Property;
 use App\Types\Unequippable;
 use App\Mask;
 
@@ -95,7 +96,12 @@ class Decoder
     public function setItemType(string $itemType): void
     {
         $itemTypeObject = 'App\Types\\' . $itemType;
-        $this->itemType = $this->validateItemType($itemType) ? new $itemTypeObject() : new Unequippable();
+
+        if ($itemType == 'Property') {
+            $this->itemType = new Property;
+        }
+
+        $this->itemType = $this->validateItemType($itemType) ? new $itemTypeObject() : new Unequippable;
     }
 
     public function guessItemType(int $mask) : void
