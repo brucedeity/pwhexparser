@@ -21,7 +21,7 @@ class Decoder
 
     const SHORT_SIZE = 2;
     const INT_SIZE = 4;
-    const INT8_SIZE = 8;
+    const LONG_SIZE = 8;
     const MAX_SOCKETS_COUNT = 4;
     const ATTACK_RATE_FACTOR = 20;
     const SPECIAL_ADDON_ID = 4;
@@ -227,10 +227,10 @@ class Decoder
                 return $this->hexToDecimal($hex, self::INT_SIZE, $prefixToRemove, true);
 
             case 'int8':
-                $hex = substr($this->getHexString(), $this->position, self::INT8_SIZE);
+                $hex = substr($this->getHexString(), $this->position, self::LONG_SIZE);
                 $this->parsedHex = $hex;
-                $this->position += self::INT8_SIZE;
-                return $this->hexToDecimal($hex, self::INT8_SIZE, $prefixToRemove, true);
+                $this->position += self::LONG_SIZE;
+                return $this->hexToDecimal($hex, self::LONG_SIZE, $prefixToRemove, true);
 
             case 'short':
                 $hex = substr($this->getHexString(), $this->position, self::SHORT_SIZE);
@@ -241,10 +241,10 @@ class Decoder
                 return $value;
 
             case 'float':
-                $hex = substr($this->getHexString(), $this->position, self::INT8_SIZE);
+                $hex = substr($this->getHexString(), $this->position, self::LONG_SIZE);
 
                 $this->parsedHex = $hex;
-                $this->position += self::INT8_SIZE;
+                $this->position += self::LONG_SIZE;
                 return $this->toFloat($hex);
         }
     }
@@ -266,8 +266,8 @@ class Decoder
             $skillPos = $this->position + (self::INT_SIZE * 4) + ($i * (self::INT_SIZE * 4));
 
             $skill = [
-                'id' => $this->hexToDecimal(substr($this->getHexString(), $skillPos, self::INT8_SIZE), self::INT8_SIZE, 0, true),
-                'level' => $this->hexToDecimal(substr($this->getHexString(), $skillPos + self::INT8_SIZE, self::INT8_SIZE), self::INT8_SIZE, 0, true),
+                'id' => $this->hexToDecimal(substr($this->getHexString(), $skillPos, self::LONG_SIZE), self::LONG_SIZE, 0, true),
+                'level' => $this->hexToDecimal(substr($this->getHexString(), $skillPos + self::LONG_SIZE, self::LONG_SIZE), self::LONG_SIZE, 0, true),
             ];
 
             array_push($skills, $skill);
@@ -336,7 +336,7 @@ class Decoder
 
         for ($i = 0; $i < $this->addonsCount; $i++) {
             $addonPos = $this->position + $i * (self::INT_SIZE * 4) + $shift;
-            $hexString = substr($this->getHexString(), $addonPos, self::INT8_SIZE);
+            $hexString = substr($this->getHexString(), $addonPos, self::LONG_SIZE);
             $hexString = ltrim($this->reverseHexNumber($hexString), '0');
 
             if (strlen($hexString) % 2 != 0) {
@@ -347,11 +347,11 @@ class Decoder
             $addonType = substr($hexString, 0, 1);
 
             if ($addonType == self::SPECIAL_ADDON_ID) {
-                $addonId = $this->hexToDecimal($hexString, self::INT8_SIZE, $addonType, false);
+                $addonId = $this->hexToDecimal($hexString, self::LONG_SIZE, $addonType, false);
                 $addon = [
                     'id' => $addonId,
-                    'value' => $this->hexToDecimal(substr($this->getHexString(), $addonPos + self::INT8_SIZE, self::INT8_SIZE), self::INT8_SIZE, 0, true),
-                    'level' => $this->hexToDecimal(substr($this->getHexString(), $addonPos + (self::INT_SIZE * 4), self::INT8_SIZE), self::INT8_SIZE, 0, true),
+                    'value' => $this->hexToDecimal(substr($this->getHexString(), $addonPos + self::LONG_SIZE, self::LONG_SIZE), self::LONG_SIZE, 0, true),
+                    'level' => $this->hexToDecimal(substr($this->getHexString(), $addonPos + (self::INT_SIZE * 4), self::LONG_SIZE), self::LONG_SIZE, 0, true),
                 ];
 
                 if ($addonId > 1691 && $addonId < 1892) {
@@ -360,14 +360,14 @@ class Decoder
                     $addons['special_addons'][] = $addon;
                 }
 
-                $shift += self::INT8_SIZE;
+                $shift += self::LONG_SIZE;
             } elseif ($addonType == self::SOCKET_ADDON_ID) {
                 $socketIndex++;
-                $addonId = $this->hexToDecimal($hexString, self::INT8_SIZE, $addonType, false);
+                $addonId = $this->hexToDecimal($hexString, self::LONG_SIZE, $addonType, false);
                 $socketAddon = [
                     'index' => $socketIndex,
                     'id' => $addonId,
-                    'value' => $this->hexToDecimal(substr($this->getHexString(), $addonPos + self::INT8_SIZE, self::INT8_SIZE), self::INT8_SIZE, 0, true),
+                    'value' => $this->hexToDecimal(substr($this->getHexString(), $addonPos + self::LONG_SIZE, self::LONG_SIZE), self::LONG_SIZE, 0, true),
                 ];
 
                 $addons['socket_addons'][] = $socketAddon;
@@ -375,7 +375,7 @@ class Decoder
                 $addonId = hexdec(substr($hexString, 1));
                 $addon = [
                     'id' => $addonId,
-                    'value' => intval($this->hexToDecimal(substr($this->getHexString(), $addonPos + self::INT8_SIZE, self::INT8_SIZE), self::INT8_SIZE, 0, true), 10),
+                    'value' => intval($this->hexToDecimal(substr($this->getHexString(), $addonPos + self::LONG_SIZE, self::LONG_SIZE), self::LONG_SIZE, 0, true), 10),
                 ];
 
                 $addons['normal_addons'][] = $addon;
@@ -404,8 +404,8 @@ class Decoder
         }
 
         for ($i = 0; $i < $this->socketsCount; $i++) {
-            $hex = $this->position + $i * self::INT8_SIZE;
-            $hex = substr($this->getHexString(), $hex, self::INT8_SIZE);
+            $hex = $this->position + $i * self::LONG_SIZE;
+            $hex = substr($this->getHexString(), $hex, self::LONG_SIZE);
 
             $sockets[$i] = $this->decodeType($hex, 'int8');
         }
