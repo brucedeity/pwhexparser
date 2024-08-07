@@ -2,10 +2,9 @@
 
 namespace App\Types;
 
-use App\Contracts\Item;
-use App\Contracts\Translate;
+use App\Contracts\Translatable;
 
-class Armor extends Translate implements Item
+class Armor extends Translatable
 {
     public function getStructure(): array
     {

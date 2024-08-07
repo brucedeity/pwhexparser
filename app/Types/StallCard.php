@@ -2,10 +2,10 @@
 
 namespace App\Types;
 
-use App\Contracts\Item;
-use App\Contracts\Translate;
 
-class StallCard extends Translate implements Item
+use App\Contracts\Translatable;
+
+class StallCard extends Translatable
 {
     public function getStructure(): array
     {

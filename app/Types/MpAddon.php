@@ -2,10 +2,10 @@
 
 namespace App\Types;
 
-use App\Contracts\Item;
-use App\Contracts\Translate;
 
-class MpAddon extends Translate implements Item
+use App\Contracts\Translatable;
+
+class MpAddon extends Translatable
 {
     public function getStructure(): array
     {

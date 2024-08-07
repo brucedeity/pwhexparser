@@ -1,24 +1,27 @@
-# pwhexparser
+## From this:
+`64002000360000002e0100003c140000007d00002c00040a4200720075006300650002000000c55c00000f00000000000000ad0200000404000000000000000000000e000000000020400000000002000900c8be0000c8be000006000000114500009200000001000000a421000001000000a421000001000000aa460000d40100000a000000dea100004b000000dea100004b000000`
 
-This project is able to decode PW's hexadecimal strings based on their predefined structure.
+## To this:
+<img src="images/example.png" width="500">
+
+This project decodes PW's hexadecimal strings based on their predefined structure.
 
 ## Features
 
-- Decode the structure for Weapon, Armor, Fashion, Jewelry, Flight, Role Property and more.
-- Retrieve the decoded data as json.
+- Decode the structure for Weapon, Armor, Fashion, Jewelry, Flight, Role Property, and more.
+- Retrieve the decoded data as JSON.
 - Error handling and validation for input data.
 
 ## Installation
 
-You can install the package via composer:
+Install the package via Composer:
 
 ```bash
 composer require brucedeity/pwhexparser
 ```
+## Example Usage
 
-## Example
-
-Here's an example usage of the PWHexParser library:
+Here's an example of how to use the PWHexParser library:
 
 ```php
 <?php
@@ -26,17 +29,15 @@ Here's an example usage of the PWHexParser library:
 require __DIR__ . '/../vendor/autoload.php';
 
 $decoder = new App\Decoder();
-$decoder->setItemType('Fashion'); // Weapon, Armor, Charm, Jewelry, Flight, Card...
-$decoder->sethexString('1e00000092470100010a620072007500630065000000'); //Mandarin Silk Gown
+$decoder->setItemType('Fashion'); // Options: Weapon, Armor, Charm, Jewelry, Flight, Card...
+$decoder->sethexString('1e00000092470100010a620072007500630065000000'); // Mandarin Silk Gown
 $result = $decoder->decode();
 
 header('Content-Type: application/json');
 echo json_encode($result, JSON_PRETTY_PRINT);
 ```
-
-### Which will output:
-
-```php
+### Output:
+```json
 {
   "level_req": 30,
   "color": 18322,
@@ -47,8 +48,7 @@ echo json_encode($result, JSON_PRETTY_PRINT);
   "color_mask": 0
 }
 ```
-
-### Guessing item type:
+### Guessing Item Type
 
 You can also guess the item type based on the item's mask:
 
@@ -67,10 +67,9 @@ $result = $decoder->decode();
 header('Content-Type: application/json');
 echo json_encode($result, JSON_PRETTY_PRINT);
 ```
-
 ### Output:
 
-```php
+```json
 {
   "level": 90,
   "class": 255,
@@ -96,9 +95,7 @@ echo json_encode($result, JSON_PRETTY_PRINT);
   "attack_range": 3.5,
   "minimum_range": 0,
   "sockets_count": 1,
-  "sockets": [
-    0
-  ],
+  "sockets": [0],
   "addons_count": 3,
   "addons": {
     "special_addons": [
@@ -118,27 +115,144 @@ echo json_encode($result, JSON_PRETTY_PRINT);
         "value": 14
       }
     ],
-    "refine_addons": [
-      
-    ],
-    "socket_addons": [
-      
-    ]
+    "refine_addons": [],
+    "socket_addons": []
   }
 }
 ```
-
-### Translating fields:
+### Translating Fields
 
 ```php
-
 <?php
+
 $mask = 1; // Weapon
 
-$decoder = new Decoder;
+$decoder = new Decoder();
 $decoder->guessItemType($mask);
 $decoder->setLang('pt-BR');
 $decoder->sethexString('64002000360000002e0100008c7b0000007d00002c000406480075007a0002000000c55c00000f00000000000000ad02000004040000000000000000000010000000000020400000000002000900d0070000d007000005000000db21000003000000852500005e010000cc25000012000000e1a1000064000000e1a1000064000000');
-$decoder->setLang('pt-BR');
 
 echo json_encode($decoder->translate(), JSON_PRETTY_PRINT);
+```
+### Output:
+
+```json
+{
+  "item_type": {
+    "translated": "item_type",
+    "value": 44
+  },
+  "weapon_type": {
+    "translated": "weapon_type",
+    "value": 23749
+  },
+  "weapon_grade": {
+    "translated": "Nv.",
+    "value": 15
+  },
+  "attack_rate": {
+    "translated": "Frequência de ataque (vezes/s)",
+    "value": 1.25
+  },
+  "attack_range": {
+    "translated": "Alcance",
+    "value": 2.5
+  },
+  "physical_damage": {
+    "translated": "Ataque físico",
+    "value": "685-1028"
+  },
+  "magic_damage": {
+    "translated": "AtqM",
+    "value": "0-0"
+  },
+  "durability": {
+    "translated": "Durabilidade",
+    "value": "316/320"
+  },
+  "ammunition_type": {
+    "translated": "Tipo de Munição",
+    "value": 0
+  },
+  "class": {
+    "translated": "Restrição de Classe",
+    "value": 32
+  },
+  "level": {
+    "translated": "Nv. necessário:",
+    "value": 100
+  },
+  "strength": {
+    "translated": "For. necessária:",
+    "value": 54
+  },
+  "vitality": {
+    "translated": "Con. necessária:",
+    "value": 0
+  },
+  "dexterity": {
+    "translated": "Des. necessária:",
+    "value": 302
+  },
+  "magic": {
+    "translated": "Int. necessária",
+    "value": 0
+  },
+  "minimum_range": {
+    "translated": "Dist. Fragilidade",
+    "value": 0
+  },
+  "sockets_count": {
+    "translated": "sockets_count",
+    "value": 2
+  },
+  "sockets": {
+    "translated": "sockets",
+    "value": [
+      2000,
+      2000
+    ]
+  },
+  "addons_count": {
+    "translated": "addons_count",
+    "value": 5
+  },
+  "addons": {
+    "translated": "addons",
+    "value": {
+      "special_addons": [],
+      "normal_addons": [
+        {
+          "id": 475,
+          "value": 3
+        },
+        {
+          "id": 1413,
+          "value": 350
+        },
+        {
+          "id": 1484,
+          "value": 18
+        }
+      ],
+      "refine_addons": [],
+      "socket_addons": [
+        {
+          "index": 1,
+          "id": 481,
+          "value": 100
+        },
+        {
+          "index": 2,
+          "id": 481,
+          "value": 100
+        }
+      ]
+    }
+  },
+  "name": {
+    "translated": "Feito por",
+    "value": "Huz"
+  }
+}
+```

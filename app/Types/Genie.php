@@ -2,10 +2,10 @@
 
 namespace App\Types;
 
-use App\Contracts\Item;
-use App\Contracts\Translate;
 
-class Genie extends Translate implements Item
+use App\Contracts\Translatable;
+
+class Genie extends Translatable
 {
     public function getStructure(): array
     {
