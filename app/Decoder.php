@@ -116,46 +116,70 @@ class Decoder
         return $this->itemType;
     }
 
-    private function validateHex(): void
+    private function validateHex(&$error) : bool
     {
         if (empty($this->getHexString())) {
-            throw new Exception('Hex string not set, please use setHexString() method before calling validateHex(). Item type: '. get_class($this->itemType));
+            $error = 'Hex string not set, please use setHexString(). Item type: '. get_class($this->itemType);
+
+            return false;
         }
-        elseif (!ctype_xdigit($this->getHexString())) {
-            throw new Exception('Invalid hexadecimal string for type '. get_class($this->itemType));
+
+        if (!ctype_xdigit($this->getHexString())) {
+            $error = 'Invalid hexadecimal string for type '. get_class($this->itemType);
+
+            return false;
         }
-        elseif ($this->getItemType() === null) {
-            throw new Exception('Item type not set, please use setItemType() method before calling decode()');
+
+        if ($this->getItemType() === null) {
+            $error = 'Item type not set, please use setItemType() method before calling decode()';
+
+            return false;
         }
-        elseif (strlen($this->getHexString()) < $this->getItemType()->getMinimumLength()) {
-            throw new Exception('Hex string is too short for ' . get_class($this->itemType) . ', given: ' . strlen($this->getHexString()) . ', expected: ' . $this->getItemType()->getMinimumLength() . '');
+
+        if (strlen($this->getHexString()) < $this->getItemType()->getMinimumLength()) {
+            $error = 'Hex string is too short for ' . get_class($this->itemType) . ', given: ' . strlen($this->getHexString()) . ', expected: ' . $this->getItemType()->getMinimumLength();
+
+            return false;
         }
+
+        return true;
     }
 
     public function decode(): array
     {
-        if ($this->itemType instanceof Unequippable || $this->itemType instanceof Bible || $this->itemType instanceof DynSKill) {
+        if ($this->itemType instanceof Unequippable) {
             return [];
         }
 
-        $result = [];
+        try
+        {
+            $error = '';
 
-        try {
-            $this->validateHex();
+            if (!$this->validateHex($error)) {
+                return [
+                    'error' => "Error while validating hex: {$error}"
+                ];
+            }
 
-            foreach ($this->getItemType()->getStructure() as $field => $type) {
-                $result[$field] = $this->decodeType($field, $type);
-            }
-        } catch (Exception $e) {
-            if (method_exists($this->getItemType(), 'getExtraStructure')) {
-                foreach ($this->getItemType()->getExtraStructure() as $field => $type) {
-                    $result[$field] = $this->decodeType($field, $type);
-                }
-            } else {
-                throw $e;
-            }
+            $structure = $this->getItemType()->getStructure();
+            $result = $this->decodeStructure($structure);
+
+            return $result;
         }
+        catch (Exception $e)
+        {
+            return [
+                'error' => 'Exception while decoding hex: ' . $e->getMessage()
+            ];
+        }
+    }
 
+    private function decodeStructure(array $structure): array
+    {
+        $result = [];
+        foreach ($structure as $field => $type) {
+            $result[$field] = $this->decodeType($field, $type);
+        }
         return $result;
     }
 
@@ -165,7 +189,13 @@ class Decoder
             return [];
         }
 
-        $this->validateHex();
+        $error = '';
+
+        if (!$this->validateHex($error)) {
+            return [
+                'error' => "Error while validating hex for debug: {$error}"
+            ];
+        }
 
         $result = [];
 

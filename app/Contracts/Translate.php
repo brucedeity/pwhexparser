@@ -34,4 +34,14 @@ abstract class Translate
 
         return $name;
     }
+    
+    public function getStructure(): array
+    {
+        return [];
+    }
+
+    public function getMinimumLength(): int
+    {
+        return 0;
+    }
 }
