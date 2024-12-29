@@ -195,9 +195,6 @@ class Decoder
 
                 $keys = $structure[$field];
 
-                // echo json_encode($keys);
-                // exit;
-
                 for ($i = 0; $i < $count; $i++)
                 {
                     foreach ($keys as $key => $keyType)
@@ -244,9 +241,6 @@ class Decoder
 
     private function decodeType(string $field, mixed $type, int $prefixToRemove = 0)
     {
-        // skills: 020000004a040000000000000a0000005a040000000000000a000000
-        // if type is array, then 
-
         switch ($type)
         {
             case 'addons_count':
@@ -413,7 +407,8 @@ class Decoder
         $socketIndex = 0;
         $shift = 0;
 
-        for ($i = 0; $i < $this->addonsCount; $i++) {
+        for ($i = 0; $i < $this->addonsCount; $i++)
+        {
             $addonPos = $this->position + $i * (self::INT32_SIZE * 4) + $shift;
             $hexString = substr($this->getHexString(), $addonPos, self::INT64_SIZE);
             $hexString = ltrim($this->reverseHexNumber($hexString), '0');
@@ -425,7 +420,8 @@ class Decoder
             $hexString = trim($hexString);
             $addonType = substr($hexString, 0, 1);
 
-            if ($addonType == self::SPECIAL_ADDON_ID) {
+            if ($addonType == self::SPECIAL_ADDON_ID)
+            {
                 $addonId = $this->hexToDecimal($hexString, self::INT64_SIZE, $addonType, false);
                 $addon = [
                     'id' => $addonId,
@@ -433,14 +429,19 @@ class Decoder
                     'level' => $this->hexToDecimal(substr($this->getHexString(), $addonPos + (self::INT32_SIZE * 4), self::INT64_SIZE), self::INT64_SIZE, 0, true),
                 ];
 
-                if ($addonId > 1691 && $addonId < 1892) {
+                if ($addonId > 1691 && $addonId < 1892)
+                {
                     $addons['refine_addons'] = $addon;
-                } else {
+                }
+                else
+                {
                     $addons['special_addons'][] = $addon;
                 }
 
                 $shift += self::INT64_SIZE;
-            } elseif ($addonType == self::SOCKET_ADDON_ID) {
+            }
+            elseif ($addonType == self::SOCKET_ADDON_ID)
+            {
                 $socketIndex++;
                 $addonId = $this->hexToDecimal($hexString, self::INT64_SIZE, $addonType, false);
                 $socketAddon = [
@@ -450,7 +451,9 @@ class Decoder
                 ];
 
                 $addons['socket_addons'][] = $socketAddon;
-            } else {
+            }
+            else
+            {
                 $addonId = hexdec(substr($hexString, 1));
                 $addon = [
                     'id' => $addonId,
