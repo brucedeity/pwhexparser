@@ -10,12 +10,12 @@ class MpAddon extends Translate implements Item
     public function getStructure(): array
     {
         return [
-            'total' => 'INT64_SIZE',
+            'total' => 'int64',
             'trigger' => 'float',
         ];
     }
 
-    public function getMinimumLength() : int32
+    public function getMinimumLength() : int
     {
         return 15;
     }

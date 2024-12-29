@@ -10,11 +10,11 @@ class TaskDice extends Translate implements Item
     public function getStructure(): array
     {
         return [
-            'quest_id' => 'INT64_SIZE',
+            'quest_id' => 'int64',
         ];
     }
 
-    public function getMinimumLength() : int32
+    public function getMinimumLength() : int
     {
         return 8;
     }

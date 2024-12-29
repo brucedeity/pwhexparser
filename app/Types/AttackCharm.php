@@ -17,7 +17,7 @@ class AttackCharm extends Translate implements Item
         ];
     }
 
-    public function getMinimumLength() : int32
+    public function getMinimumLength() : int
     {
         return 15;
     }

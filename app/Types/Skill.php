@@ -10,12 +10,15 @@ class Skill extends Translate implements Item
     public function getStructure(): array
     {
         return [
-            'skill' => 'INT64_SIZE',
-            'level' => 'INT64_SIZE',
+            'skills' => [
+                'skill' => 'int64',
+                'progress' => 'int64',
+                'level' => 'int64',
+            ]
         ];
     }
 
-    public function getMinimumLength() : int32
+    public function getMinimumLength() : int
     {
         return 8;
     }

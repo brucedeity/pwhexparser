@@ -22,14 +22,14 @@ class Weapon extends Translate implements Item
             'item_flag' => 'short',
             'name_length' => 'name_length',
             'name' => 'name',
-            'ranged_type' => 'INT64_SIZE',
-            'weapon_type' => 'INT64_SIZE',
-            'weapon_grade' => 'INT64_SIZE',
-            'ammunition_type' => 'INT64_SIZE',
-            'min_physical_damage' => 'INT64_SIZE',
-            'max_physical_damage' => 'INT64_SIZE',
-            'min_magic_damage' => 'INT64_SIZE',
-            'max_magic_damage' => 'INT64_SIZE',
+            'ranged_type' => 'int64',
+            'weapon_type' => 'int64',
+            'weapon_grade' => 'int64',
+            'ammunition_type' => 'int64',
+            'min_physical_damage' => 'int64',
+            'max_physical_damage' => 'int64',
+            'min_magic_damage' => 'int64',
+            'max_magic_damage' => 'int64',
             'attack_rate' => 'attack_rate',
             'attack_range' => 'float',
             'minimum_range' => 'float',
@@ -40,7 +40,7 @@ class Weapon extends Translate implements Item
         ];
     }
 
-    public function getMinimumLength() : int32
+    public function getMinimumLength() : int
     {
         return 151;
     }

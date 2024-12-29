@@ -1,5 +1,5 @@
 <?php
 
 return [
-    'quest_id' => 'INT64_SIZE',
+    'quest_id' => 'int64',
 ];

@@ -1,12 +1,12 @@
 <?php
 
 return [
-    'type' => 'INT64_SIZE',
-    'class' => 'INT64_SIZE',
-    'level' => 'INT64_SIZE',
-    'leadership' => 'INT64_SIZE',
-    'max_level' => 'INT64_SIZE',
-    'current_level' => 'INT64_SIZE',
-    'current_exp' => 'INT64_SIZE',
-    'merge_times' => 'INT64_SIZE',
+    'type' => 'int64',
+    'class' => 'int64',
+    'level' => 'int64',
+    'leadership' => 'int64',
+    'max_level' => 'int64',
+    'current_level' => 'int64',
+    'current_exp' => 'int64',
+    'merge_times' => 'int64',
 ];

@@ -105,7 +105,7 @@ class Decoder
 
     public function setItemType(string $itemType): void
     {
-        if (!$this->validateItemType($itemType) && $itemType != 'Property') {
+        if (!$this->validateItemType($itemType) && $itemType != 'Property' && $itemType != 'Skill') {
             throw new Exception('Invalid item type: ' . $itemType);
         }
 
@@ -187,9 +187,31 @@ class Decoder
     private function decodeStructure(array $structure): array
     {
         $result = [];
-        foreach ($structure as $field => $type) {
+        foreach ($structure as $field => $type)
+        {
+            if (is_array($type))
+            {
+                $count = $this->decodeType('', 'int64');
+
+                $keys = $structure[$field];
+
+                // echo json_encode($keys);
+                // exit;
+
+                for ($i = 0; $i < $count; $i++)
+                {
+                    foreach ($keys as $key => $keyType)
+                    {
+                        $result[$field][$i][$key] = $this->decodeType($key, $keyType);
+                    }
+                }
+                
+                continue;
+            }
+
             $result[$field] = $this->decodeType($field, $type);
         }
+
         return $result;
     }
 
@@ -220,68 +242,88 @@ class Decoder
         return $result;
     }
 
-    private function decodeType(string $field, string $type, int $prefixToRemove = 0)
+    private function decodeType(string $field, mixed $type, int $prefixToRemove = 0)
     {
-        switch ($type) {
+        // skills: 020000004a040000000000000a0000005a040000000000000a000000
+        // if type is array, then 
+
+        switch ($type)
+        {
             case 'addons_count':
+            {
                 return $this->getAddonsCount($field);
-
+            }
             case 'addons':
+            {
                 return $this->getAddons();
-
+            }
             case 'sockets_count':
+            {
                 return $this->getSocketsCount($field);
-
+            }
             case 'sockets':
+            {
                 return $this->getSockets();
-
+            }
             case 'name':
+            {
                 return $this->getName();
-
+            }
             case 'pack_name':
+            {
                 return $this->packName();
-
+            }
             case 'skills':
+            {
                 return $this->getSkills($field);
-
+            }
             case 'skills_count':
+            {
                 return $this->getSkillsCount($field);
-
+            }
             case 'attack_rate':
+            {
                 return $this->getAttackRate($field);
-
+            }
             case 'name_length':
+            {
                 return $this->getNameLength($field);
-
+            }
             case 'durability':
+            {
                 return $this->getDurability($field);
-
+            }
             case 'int32':
+            {
                 $hex = substr($this->getHexString(), $this->position, self::INT32_SIZE);
                 $this->parsedHex = $hex;
                 $this->position += self::INT32_SIZE;
                 return $this->hexToDecimal($hex, self::INT32_SIZE, $prefixToRemove, true);
-
+            }
             case 'int64':
+            {
                 $hex = substr($this->getHexString(), $this->position, self::INT64_SIZE);
                 $this->parsedHex = $hex;
                 $this->position += self::INT64_SIZE;
                 return $this->hexToDecimal($hex, self::INT64_SIZE, $prefixToRemove, true);
-
+            }
             case 'short':
+            {
                 $hex = substr($this->getHexString(), $this->position, self::INT8_SIZE);
                 $this->parsedHex = $hex;
                 $value = $this->hexToDecimal($hex, self::INT8_SIZE, $prefixToRemove, true);
 
                 $this->position += self::INT8_SIZE;
                 return $value;
-
+            }
             case 'float':
+            {
                 $hex = substr($this->getHexString(), $this->position, self::INT64_SIZE);
 
                 $this->parsedHex = $hex;
                 $this->position += self::INT64_SIZE;
                 return $this->toFloat($hex);
+            }
         }
     }
 
@@ -348,8 +390,9 @@ class Decoder
     {
         $this->addonsCount = $this->decodeType($field, 'int64');
 
-        if ($this->addonsCount > 30)
+        if ($this->addonsCount > 30) {
             throw new Exception('Invalid addons count, max value is 30, got ' . $this->addonsCount . ' instead');
+        }
 
         return $this->addonsCount;
     }
@@ -433,13 +476,17 @@ class Decoder
     {
         $sockets = [];
 
-        if ($this->socketsCount <= 0) {
+        if ($this->socketsCount <= 0)
+        {
             return $sockets;
-        } elseif ($this->socketsCount > self::MAX_SOCKETS_COUNT) {
+        }
+        elseif ($this->socketsCount > self::MAX_SOCKETS_COUNT)
+        {
             throw new Exception('Invalid sockets count, max value is '.self::MAX_SOCKETS_COUNT.', got ' . $this->socketsCount . ' instead');
         }
 
-        for ($i = 0; $i < $this->socketsCount; $i++) {
+        for ($i = 0; $i < $this->socketsCount; $i++)
+        {
             $hex = $this->position + $i * self::INT64_SIZE;
             $hex = substr($this->getHexString(), $hex, self::INT64_SIZE);
 
@@ -452,7 +499,9 @@ class Decoder
     private function getAttackRate(string $field): float
     {
         $attackRate = $this->decodeType($field, 'int64');
-        if ($attackRate <= 0) return 0;
+        if ($attackRate <= 0) {
+            return 0;
+        }
 
         $attackRate = self::ATTACK_RATE_FACTOR / $attackRate;
         return round($attackRate, 2);

@@ -10,7 +10,7 @@ class Fashion extends Translate implements Item
     public function getStructure(): array
     {
         return [
-            'level' => 'INT64_SIZE',
+            'level' => 'int64',
             'color' => 'int32',
             'gender' => 'int32',
             'creator_type' => 'short',
@@ -20,7 +20,7 @@ class Fashion extends Translate implements Item
         ];
     }
 
-    public function getMinimumLength() : int32
+    public function getMinimumLength() : int
     {
         return 20;
     }

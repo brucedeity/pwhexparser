@@ -10,7 +10,7 @@ class Genie extends Translate implements Item
     public function getStructure(): array
     {
         return [
-            'current_exp' => 'INT64_SIZE',
+            'current_exp' => 'int64',
             'level' => 'int32',
             'available_points' => 'int32',
             'strength' => 'int32',
@@ -24,15 +24,15 @@ class Genie extends Translate implements Item
             'fire' => 'int32',
             'earth' => 'int32',
             'refine_level' => 'int32',
-            'vigour' => 'INT64_SIZE',
-            'status_value' => 'INT64_SIZE',
-            'equipments_count' => 'INT64_SIZE',
+            'vigour' => 'int64',
+            'status_value' => 'int64',
+            'equipments_count' => 'int64',
             'skills_count' => 'skills_count',
             // 'skills' => 'skills', TODO
         ];
     }
 
-    public function getMinimumLength() : int32
+    public function getMinimumLength() : int
     {
         return 83;
     }

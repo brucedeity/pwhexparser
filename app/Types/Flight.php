@@ -10,31 +10,31 @@ class Flight extends Translate implements Item
     public function getStructure(): array
     {
         return [
-            'fuel1' => 'INT64_SIZE',
-            'fuel2' => 'INT64_SIZE',
+            'fuel1' => 'int64',
+            'fuel2' => 'int64',
             'level' => 'int32',
             'grade' => 'int32',
-            'class' => 'INT64_SIZE',
-            'time_per_element' => 'INT64_SIZE',
+            'class' => 'int64',
+            'time_per_element' => 'int64',
             'speed1' => 'float',
             'speed2' => 'float',
             'item_flag' => 'int32',
-            'crc' => 'INT64_SIZE',
+            'crc' => 'int64',
         ];
     }
 
     public function getExtraStructure() : array
     {
         return [
-            'level' => 'INT64_SIZE',
-            'mana_consumption' => 'INT64_SIZE',
-            'mana_per_second' => 'INT64_SIZE',
+            'level' => 'int64',
+            'mana_consumption' => 'int64',
+            'mana_per_second' => 'int64',
             'speed_increase' => 'float',
-            'reserved' => 'INT64_SIZE',
+            'reserved' => 'int64',
         ];
     }
 
-    public function getMinimumLength() : int32
+    public function getMinimumLength() : int
     {
         return 63;
     }

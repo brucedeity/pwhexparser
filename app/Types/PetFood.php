@@ -10,12 +10,12 @@ class PetFood extends Translate implements Item
     public function getStructure(): array
     {
         return [
-            'honor' => 'INT64_SIZE',
-            'food_mask' => 'INT64_SIZE',
+            'honor' => 'int64',
+            'food_mask' => 'int64',
         ];
     }
 
-    public function getMinimumLength() : int32
+    public function getMinimumLength() : int
     {
         return 16;
     }

@@ -38,7 +38,7 @@ class Armor extends Translate implements Item
         ];
     }
 
-    public function getMinimumLength() : int32
+    public function getMinimumLength() : int
     {
         return 135;
     }
