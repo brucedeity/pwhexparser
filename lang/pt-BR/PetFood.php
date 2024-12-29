@@ -1,6 +1,6 @@
 <?php
 
-        return [
-            'honor' => 'int8',
-            'food_mask' => 'int8',
-        ];
+return [
+    'honor' => 'INT64_SIZE',
+    'food_mask' => 'INT64_SIZE',
+];

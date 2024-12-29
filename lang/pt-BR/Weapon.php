@@ -38,7 +38,7 @@ return [
     'strength' => 'For. necessária:',
     'vitality' => 'Con. necessária:',
     'dexterity' => 'Des. necessária:',
-    'magic' => 'Int. necessária',
+    'magic' => 'int32. necessária',
     'minimum_range' => 'Dist. Fragilidade',
     'sockets_count' => 'sockets_count',
     'sockets' => 'sockets',

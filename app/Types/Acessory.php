@@ -10,27 +10,27 @@ class Acessory extends Translate implements Item
     public function getStructure(): array
     {
         return [
-            'level' => 'int',
-            'class' => 'int',
-            'strength' => 'int',
-            'vitality' => 'int',
-            'dexterity' => 'int',
-            'magic' => 'int',
+            'level' => 'int32',
+            'class' => 'int32',
+            'strength' => 'int32',
+            'vitality' => 'int32',
+            'dexterity' => 'int32',
+            'magic' => 'int32',
             'min_durability' => 'durability',
             'max_durability' => 'durability',
-            'item_type' => 'int',
+            'item_type' => 'int32',
             'item_flag' => 'short',
             'name_length' => 'name_length',
             'name' => 'name',
-            'physical_attack' => 'int8',
-            'magic_attack' => 'int8',
-            'physical_defense' => 'int8',
-            'dodge' => 'int8',
-            'metal_resistance' => 'int8',
-            'wood_resistance' => 'int8',
-            'water_resistance' => 'int8',
-            'fire_resistance' => 'int8',
-            'earth_resistance' => 'int8',
+            'physical_attack' => 'INT64_SIZE',
+            'magic_attack' => 'INT64_SIZE',
+            'physical_defense' => 'INT64_SIZE',
+            'dodge' => 'INT64_SIZE',
+            'metal_resistance' => 'INT64_SIZE',
+            'wood_resistance' => 'INT64_SIZE',
+            'water_resistance' => 'INT64_SIZE',
+            'fire_resistance' => 'INT64_SIZE',
+            'earth_resistance' => 'INT64_SIZE',
             'sockets_count' => 'sockets_count',
             'sockets' => 'sockets',
             'addons_count' => 'addons_count',
@@ -38,7 +38,7 @@ class Acessory extends Translate implements Item
         ];
     }
 
-    public function getMinimumLength() : int
+    public function getMinimumLength() : int32
     {
         return 135;
     }

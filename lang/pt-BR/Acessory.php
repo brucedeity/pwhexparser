@@ -22,7 +22,7 @@ return [
     'strength' => 'For. necessária:',
     'vitality' => 'Con. necessária:',
     'dexterity' => 'Des. necessária:',
-    'magic' => 'Int. necessária:',
+    'magic' => 'int32. necessária:',
     'sockets_count' => 'sockets_count',
     'sockets' => 'sockets',
     'addons_count' => 'addons_count',

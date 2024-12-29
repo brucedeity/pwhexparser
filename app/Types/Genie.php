@@ -10,29 +10,29 @@ class Genie extends Translate implements Item
     public function getStructure(): array
     {
         return [
-            'current_exp' => 'int8',
-            'level' => 'int',
-            'available_points' => 'int',
-            'strength' => 'int',
-            'agility' => 'int',
-            'constitution' => 'int',
-            'intelligence' => 'int',
-            'talent_points' => 'int',
-            'metal' => 'int',
-            'wood' => 'int',
-            'water' => 'int',
-            'fire' => 'int',
-            'earth' => 'int',
-            'refine_level' => 'int',
-            'vigour' => 'int8',
-            'status_value' => 'int8',
-            'equipments_count' => 'int8',
+            'current_exp' => 'INT64_SIZE',
+            'level' => 'int32',
+            'available_points' => 'int32',
+            'strength' => 'int32',
+            'agility' => 'int32',
+            'constitution' => 'int32',
+            'intelligence' => 'int32',
+            'talent_points' => 'int32',
+            'metal' => 'int32',
+            'wood' => 'int32',
+            'water' => 'int32',
+            'fire' => 'int32',
+            'earth' => 'int32',
+            'refine_level' => 'int32',
+            'vigour' => 'INT64_SIZE',
+            'status_value' => 'INT64_SIZE',
+            'equipments_count' => 'INT64_SIZE',
             'skills_count' => 'skills_count',
             // 'skills' => 'skills', TODO
         ];
     }
 
-    public function getMinimumLength() : int
+    public function getMinimumLength() : int32
     {
         return 83;
     }

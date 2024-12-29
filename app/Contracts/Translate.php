@@ -40,7 +40,7 @@ abstract class Translate
         return [];
     }
 
-    public function getMinimumLength(): int
+    public function getMinimumLength(): int32
     {
         return 0;
     }

@@ -10,18 +10,18 @@ class Card extends Translate implements Item
     public function getStructure(): array
     {
         return [
-            'type' => 'int8',
-            'class' => 'int8',
-            'level' => 'int8',
-            'leadership' => 'int8',
-            'max_level' => 'int8',
-            'current_level' => 'int8',
-            'current_exp' => 'int8',
-            'merge_times' => 'int8',
+            'type' => 'INT64_SIZE',
+            'class' => 'INT64_SIZE',
+            'level' => 'INT64_SIZE',
+            'leadership' => 'INT64_SIZE',
+            'max_level' => 'INT64_SIZE',
+            'current_level' => 'INT64_SIZE',
+            'current_exp' => 'INT64_SIZE',
+            'merge_times' => 'INT64_SIZE',
         ];
     }
 
-    public function getMinimumLength() : int
+    public function getMinimumLength() : int32
     {
         return 64;
     }

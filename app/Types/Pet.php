@@ -10,17 +10,17 @@ class Pet extends Translate implements Item
     public function getStructure(): array
     {
         return [
-            'level' => 'int8',
-            'required_class' => 'int8',
-            'loyalty' => 'int8',
-            'pet_id' => 'int8',
-            'pet_vis_tid' => 'int8',
-            'egg_id' => 'int8',
-            'pet_type' => 'int8',
-            'pet_level' => 'int',
-            'color' => 'int',
-            'current_exp' => 'int8',
-            'skill_points' => 'int8',
+            'level' => 'INT64_SIZE',
+            'required_class' => 'INT64_SIZE',
+            'loyalty' => 'INT64_SIZE',
+            'pet_id' => 'INT64_SIZE',
+            'pet_vis_tid' => 'INT64_SIZE',
+            'egg_id' => 'INT64_SIZE',
+            'pet_type' => 'INT64_SIZE',
+            'pet_level' => 'int32',
+            'color' => 'int32',
+            'current_exp' => 'INT64_SIZE',
+            'skill_points' => 'INT64_SIZE',
             'name_length' => 'name_length',
             'name' => 'pack_name',
             'skills_count' => 'skills_count',
@@ -28,7 +28,7 @@ class Pet extends Translate implements Item
         ];
     }
 
-    public function getMinimumLength() : int
+    public function getMinimumLength() : int32
     {
         return 119;
     }

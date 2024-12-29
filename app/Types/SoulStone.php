@@ -12,16 +12,16 @@ class SoulStone extends Translate implements Item
         return [
             'w_addons_count' => 'addons_count',
             'addons' => 'addons',
-            // 'level' => 'int8',
-            // 'level1' => 'int',
+            // 'level' => 'INT64_SIZE',
+            // 'level1' => 'int32',
             // 'a_addons_count' => 'addons_count',
-            // 'level2' => 'int',
-            // 'level3' => 'int',
-            // 'level4' => 'int',
+            // 'level2' => 'int32',
+            // 'level3' => 'int32',
+            // 'level4' => 'int32',
         ];
     }
 
-    public function getMinimumLength() : int
+    public function getMinimumLength() : int32
     {
         return 32;
     }

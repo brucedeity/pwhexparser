@@ -1,9 +1,9 @@
 <?php
 
 return [
-    // 'item_flag' => 'int',
+    // 'item_flag' => 'int32',
     'grade' => 'Nv.',
-    // 'time_per_element' => 'int8',
+    // 'time_per_element' => 'INT64_SIZE',
     'speed1' => 'Vôo simples (m/seg.)',
     'speed2' => 'Vôo Acelerado (m/seg.)',
     'fuel' => [
@@ -16,5 +16,5 @@ return [
     ],
     'class' => 'Restrição de Classe',
     'level' => 'Nv. necessário',
-    // 'crc' => 'int8',
+    // 'crc' => 'INT64_SIZE',
 ];

@@ -10,12 +10,12 @@ class HpAddon extends Translate implements Item
     public function getStructure(): array
     {
         return [
-            'total' => 'int8',
+            'total' => 'int64',
             'trigger' => 'float',
         ];
     }
 
-    public function getMinimumLength() : int
+    public function getMinimumLength() : int32
     {
         return 15;
     }

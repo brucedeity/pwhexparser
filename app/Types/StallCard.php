@@ -12,7 +12,7 @@ class StallCard extends Translate implements Item
         return [];
     }
 
-    public function getMinimumLength() : int
+    public function getMinimumLength() : int32
     {
         return 0;
     }

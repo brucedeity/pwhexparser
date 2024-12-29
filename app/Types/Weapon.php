@@ -10,26 +10,26 @@ class Weapon extends Translate implements Item
     public function getStructure() : array
     {
         return [
-            'level' => 'int',
-            'class' => 'int',
-            'strength' => 'int',
-            'vitality' => 'int',
-            'dexterity' => 'int',
-            'magic' => 'int',
+            'level' => 'int32',
+            'class' => 'int32',
+            'strength' => 'int32',
+            'vitality' => 'int32',
+            'dexterity' => 'int32',
+            'magic' => 'int32',
             'min_durability' => 'durability',
             'max_durability' => 'durability',
-            'item_type' => 'int',
+            'item_type' => 'int32',
             'item_flag' => 'short',
             'name_length' => 'name_length',
             'name' => 'name',
-            'ranged_type' => 'int8',
-            'weapon_type' => 'int8',
-            'weapon_grade' => 'int8',
-            'ammunition_type' => 'int8',
-            'min_physical_damage' => 'int8',
-            'max_physical_damage' => 'int8',
-            'min_magic_damage' => 'int8',
-            'max_magic_damage' => 'int8',
+            'ranged_type' => 'INT64_SIZE',
+            'weapon_type' => 'INT64_SIZE',
+            'weapon_grade' => 'INT64_SIZE',
+            'ammunition_type' => 'INT64_SIZE',
+            'min_physical_damage' => 'INT64_SIZE',
+            'max_physical_damage' => 'INT64_SIZE',
+            'min_magic_damage' => 'INT64_SIZE',
+            'max_magic_damage' => 'INT64_SIZE',
             'attack_rate' => 'attack_rate',
             'attack_range' => 'float',
             'minimum_range' => 'float',
@@ -40,7 +40,7 @@ class Weapon extends Translate implements Item
         ];
     }
 
-    public function getMinimumLength() : int
+    public function getMinimumLength() : int32
     {
         return 151;
     }

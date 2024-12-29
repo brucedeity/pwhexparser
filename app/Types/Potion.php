@@ -10,14 +10,14 @@ class Potion extends Translate implements Item
     public function getStructure(): array
     {
         return [
-            'amount' => 'int8',
-            'time' => 'int8',
-            'recharge_time' => 'int8',
-            'level' => 'int8',
+            'amount' => 'INT64_SIZE',
+            'time' => 'INT64_SIZE',
+            'recharge_time' => 'INT64_SIZE',
+            'level' => 'INT64_SIZE',
         ];
     }
 
-    public function getMinimumLength() : int
+    public function getMinimumLength() : int32
     {
         return 32;
     }

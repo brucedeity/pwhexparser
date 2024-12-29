@@ -46,7 +46,7 @@ class Mask
     public const SECURITY_PASSWD_PROTECTED = 0x2205F7FF;
     public const DYNSKILL_ALL = 0x18000000;
 
-    public static function decode(int $mask) : array
+    public static function decode(int32 $mask) : array
     {
         $reflection = new \ReflectionClass(__CLASS__);
         $constants = $reflection->getConstants();
@@ -65,7 +65,7 @@ class Mask
         return $flags;
     }
 
-    public static function getEquipmentTypeFromMask(int $mask) : string
+    public static function getEquipmentTypeFromMask(int32 $mask) : string
     {
         if ($mask === 0) {
             return 'Unequippable';

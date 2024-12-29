@@ -5,15 +5,18 @@ namespace App\Types;
 use App\Contracts\Item;
 use App\Contracts\Translate;
 
-class Bugle extends Translate implements Item
+class Skill extends Translate implements Item
 {
     public function getStructure(): array
     {
-        return [];
+        return [
+            'skill' => 'INT64_SIZE',
+            'level' => 'INT64_SIZE',
+        ];
     }
 
     public function getMinimumLength() : int32
     {
-        return 0;
+        return 8;
     }
 }
