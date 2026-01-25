@@ -490,10 +490,7 @@ class Decoder
 
         for ($i = 0; $i < $this->socketsCount; $i++)
         {
-            $hex = $this->position + $i * self::INT64_SIZE;
-            $hex = substr($this->getHexString(), $hex, self::INT64_SIZE);
-
-            $sockets[$i] = $this->decodeType($hex, 'int64');
+            $sockets[$i] = $this->decodeType((string)$i, 'int64');
         }
 
         return $sockets;
@@ -527,7 +524,11 @@ class Decoder
 
     private function reverseHexNumber($number)
     {
-        return implode('', array_reverse(str_split($number, 2)));
+        if (strlen($number) % 2 != 0) {
+            return $number;
+        }
+
+        return bin2hex(strrev(hex2bin($number)));
     }
 
     private function toFloat(string $hex): float
@@ -538,20 +539,49 @@ class Decoder
 
     private function hexToDecimal(string $hexString, int $expectedLength, mixed $prefixToRemove = NULL, bool $reverse = true)
     {
-        $paddingLength = $expectedLength - strlen($hexString);
-
-        $hexString = str_pad($hexString, $paddingLength, '0', STR_PAD_LEFT);
-
-        if ($reverse) {
-            $hexString = $this->reverseHexNumber($hexString);
-        }
-
-        if (empty($hexString) || !ctype_xdigit($hexString)) {
+        if ($hexString === '')
+        {
             return 0;
         }
 
-        if ($prefixToRemove !== 0 && strpos($hexString, $prefixToRemove) === 0) {
-            $hexString = substr($hexString, 1);
+        $len = strlen($hexString);
+        if ($len < $expectedLength)
+        {
+            $hexString = str_pad($hexString, $expectedLength, '0', STR_PAD_LEFT);
+        }
+
+        if (!ctype_xdigit($hexString))
+        {
+            return 0;
+        }
+
+        if ($reverse && ($prefixToRemove === NULL || $prefixToRemove === 0))
+        {
+            $bin = hex2bin($hexString);
+            if ($bin !== false)
+            {
+                switch($expectedLength)
+                {
+                    case 2: return unpack('C', $bin)[1];
+                    case 4: return unpack('v', $bin)[1];
+                    case 8: return unpack('V', $bin)[1];
+                    case 16: return unpack('P', $bin)[1];
+                }
+            }
+        }
+
+        if ($reverse)
+        {
+            $hexString = $this->reverseHexNumber($hexString);
+        }
+
+        if ($prefixToRemove !== NULL && $prefixToRemove !== 0)
+        {
+            $prefixStr = (string)$prefixToRemove;
+            if (strpos($hexString, $prefixStr) === 0)
+            {
+                $hexString = substr($hexString, strlen($prefixStr));
+            }
         }
 
         return intval(base_convert($hexString, 16, 10));
